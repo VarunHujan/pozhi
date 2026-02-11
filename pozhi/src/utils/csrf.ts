@@ -10,7 +10,8 @@ let csrfToken: string | null = null;
  */
 export async function fetchCsrfToken(): Promise<string> {
     try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/v1/csrf-token`, {
+        const BACKEND_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
+        const response = await fetch(`${BACKEND_URL}/api/v1/csrf-token`, {
             method: 'GET',
             credentials: 'include' // Important: send cookies
         });

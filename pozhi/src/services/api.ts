@@ -2,7 +2,8 @@
 // API SERVICE - Fetch pricing from backend
 // ==========================================
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
+const BACKEND_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
+const API_BASE_URL = `${BACKEND_URL}/api/v1`;
 
 // ==========================================
 // PRICING API
