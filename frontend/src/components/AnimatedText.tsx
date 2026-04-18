@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const words = ["MEMORIES", "LIFE", "ART"];
+const words = ["MEMORIES", "LIFE", "ART", "STORIES"];
 
 const AnimatedText = ({ visible }: { visible: boolean }) => {
   const [index, setIndex] = useState(0);
@@ -10,7 +10,7 @@ const AnimatedText = ({ visible }: { visible: boolean }) => {
     if (!visible) return;
     const interval = setInterval(() => {
       setIndex((prev) => (prev + 1) % words.length);
-    }, 2800);
+    }, 2600);
     return () => clearInterval(interval);
   }, [visible]);
 
@@ -19,11 +19,11 @@ const AnimatedText = ({ visible }: { visible: boolean }) => {
       <AnimatePresence mode="wait">
         <motion.span
           key={words[index]}
-          initial={{ opacity: 0, y: 40, filter: "blur(8px)" }}
+          initial={{ opacity: 0, y: 50, filter: "blur(12px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           exit={{ opacity: 0, y: -40, filter: "blur(8px)" }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/60"
+          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+          className="inline-block text-gradient"
         >
           {words[index]}
         </motion.span>

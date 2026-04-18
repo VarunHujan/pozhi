@@ -6,17 +6,20 @@ import Navbar from "@/components/Navbar";
 import FramePreview from "@/components/frames/FramePreview";
 import MaterialTabs from "@/components/frames/MaterialTabs";
 import SizeSelector from "@/components/frames/SizeSelector";
-import { fetchFramesPricing, type FrameMaterial, type FrameSize } from "@/services/api";
+import { fetchFramesPricing, type FrameMaterial as ApiFrameMaterial, type FrameSize } from "@/services/api";
+import type { FrameMaterial } from "@/lib/frames-data";
 
 const Frames = () => {
   const navigate = useNavigate();
-  const [materials, setMaterials] = useState<FrameMaterial[]>([]);
+  const [materials, setMaterials] = useState<ApiFrameMaterial[]>([]);
   const [frameSizes, setFrameSizes] = useState<FrameSize[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [selectedMaterial, setSelectedMaterial] = useState<string>("glass");
+  const [selectedMaterial, setSelectedMaterial] = useState<FrameMaterial>("glass");
   const [selectedSizeId, setSelectedSizeId] = useState("");
+  const [uploadId, setUploadId] = useState<string | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   // Fetch pricing from API
   useEffect(() => {
@@ -42,6 +45,16 @@ const Frames = () => {
     loadPricing();
   }, []);
 
+  const handleUploadComplete = (id: string, url: string) => {
+    setUploadId(id);
+    setImageUrl(url);
+  };
+
+  const handleClear = () => {
+    setUploadId(null);
+    setImageUrl(null);
+  };
+
   const currentSize = useMemo(
     () => frameSizes.find((s) => s.id === selectedSizeId),
     [frameSizes, selectedSizeId]
@@ -50,9 +63,16 @@ const Frames = () => {
   const handleBuyNow = () => {
     if (!currentSize) return;
 
+    // 🛑 VALIDATION: Image upload is mandatory
+    if (!uploadId) {
+      alert("Please upload a photo to continue.");
+      return;
+    }
+
     navigate("/checkout", {
       state: {
         service: "Frames",
+        uploadId: uploadId,
         title: `${selectedMaterial === "glass" ? "Glass" : "Lamination"} Frame (${currentSize.sizeLabel})`,
         details: [
           {
@@ -125,7 +145,13 @@ const Frames = () => {
               transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] as const }}
               className="lg:w-[45%] lg:sticky lg:top-24 lg:self-start"
             >
-              <FramePreview size={currentSize} material={selectedMaterial} />
+              <FramePreview
+                size={currentSize}
+                material={selectedMaterial}
+                imageUrl={imageUrl}
+                onUploadComplete={handleUploadComplete}
+                onClear={handleClear}
+              />
             </motion.div>
 
             {/* Right Column — Controls */}
@@ -175,9 +201,9 @@ const Frames = () => {
                   Frame Material
                 </p>
                 <MaterialTabs
-                  materials={materials}
+                  materials={materials as any}
                   selectedId={selectedMaterial}
-                  onSelect={setSelectedMaterial}
+                  onSelect={(id: any) => setSelectedMaterial(id)}
                 />
               </div>
 
@@ -193,17 +219,18 @@ const Frames = () => {
                 />
               </div>
 
-              {/* CTA — desktop */}
-              <div className="hidden lg:block pt-4">
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={handleBuyNow}
-                  className="w-full flex items-center justify-center gap-3 py-4 px-8 bg-primary text-primary-foreground font-display font-bold text-lg rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300"
-                >
-                  <ShoppingCart className="w-5 h-5" />
-                  Buy Now
-                </motion.button>
+              <div className="pt-8 mt-auto border-t border-border">
+                <div className="flex items-center justify-between mb-6">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={handleBuyNow}
+                    className="w-full flex items-center justify-center gap-3 py-4 px-8 bg-primary text-primary-foreground font-display font-bold text-lg rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300"
+                  >
+                    <ShoppingCart className="w-5 h-5" />
+                    Buy Now
+                  </motion.button>
+                </div>
               </div>
             </motion.div>
           </div>

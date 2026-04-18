@@ -1,6 +1,7 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Copy, Check, LogOut, Package, Truck, Printer, ChevronRight, Lock, Eye, EyeOff, UserPlus, Loader2 } from "lucide-react";
+import { Copy, Check, LogOut, Package, Truck, Printer, ChevronRight, Lock, Eye, EyeOff, UserPlus, Loader2, X } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import PasskeyButton from "@/components/auth/PasskeyButton";
 import PasskeyManager from "@/components/auth/PasskeyManager";
@@ -17,11 +18,32 @@ interface Order {
   status: "Processing" | "Printed" | "Out for Delivery" | "Delivered";
 }
 
+import { fetchUserOrders, Order as ApiOrder } from "@/services/api";
+
 const statusSteps = ["Processing", "Printed", "Out for Delivery", "Delivered"] as const;
 const getStatusIndex = (status: string) => statusSteps.indexOf(status as typeof statusSteps[number]);
 
+// Map backend 'order_status' to frontend UI status
+const mapBackendStatusToUI = (status: string) => {
+  switch (status) {
+    case 'pending':
+    case 'confirmed':
+      return 'Processing';
+    case 'processing':
+    case 'ready':
+      return 'Printed';
+    case 'out_for_delivery':
+      return 'Out for Delivery';
+    case 'delivered':
+      return 'Delivered';
+    default:
+      return 'Processing';
+  }
+}
+
 const Account = () => {
   const { user, isAuthenticated, isLoading: authLoading, login, signup, logout } = useAuth();
+  const navigate = useNavigate();
 
   const [authView, setAuthView] = useState<AuthView>("login");
   const [email, setEmail] = useState("");
@@ -34,8 +56,38 @@ const Account = () => {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"orders" | "security">("orders");
 
-  // TODO: Replace with real orders from API
-  const orders: Order[] = [];
+  const [orders, setOrders] = useState<ApiOrder[]>([]);
+  const [loadingOrders, setLoadingOrders] = useState(false);
+
+  const activeOrders = useMemo(() => {
+    return orders.filter(o => !['delivered', 'cancelled', 'completed'].includes(o.order_status?.toLowerCase()));
+  }, [orders]);
+
+  const historyOrders = useMemo(() => {
+    return orders.filter(o => ['delivered', 'cancelled', 'completed'].includes(o.order_status?.toLowerCase()));
+  }, [orders]);
+
+  useEffect(() => {
+    console.log('[Account] Active Orders:', activeOrders);
+    console.log('[Account] History Orders:', historyOrders);
+  }, [activeOrders, historyOrders]);
+
+  // Fetch orders when tab is active and user is logged in
+  useEffect(() => {
+    if (isAuthenticated && activeTab === "orders") {
+      setLoadingOrders(true);
+      fetchUserOrders()
+        .then(data => {
+          console.log('[Account] Fetched orders:', data);
+          console.log('[Account] Statuses:', data.map(o => o.order_status));
+          setOrders(data);
+        })
+        .catch(err => console.error("Failed to fetch orders:", err))
+        .finally(() => setLoadingOrders(false));
+    }
+  }, [isAuthenticated, activeTab]);
+
+
 
   const handleLogin = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -147,11 +199,10 @@ const Account = () => {
                         <button
                           key={view}
                           onClick={() => { setAuthView(view); setError(null); }}
-                          className={`relative flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-semibold uppercase tracking-wider transition-colors duration-200 ${
-                            authView === view
-                              ? "text-primary"
-                              : "text-muted-foreground hover:text-foreground"
-                          }`}
+                          className={`relative flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-semibold uppercase tracking-wider transition-colors duration-200 ${authView === view
+                            ? "text-primary"
+                            : "text-muted-foreground hover:text-foreground"
+                            }`}
                         >
                           {authView === view && (
                             <motion.div
@@ -410,9 +461,8 @@ const Account = () => {
                         <button
                           key={tab}
                           onClick={() => setActiveTab(tab)}
-                          className={`relative flex-1 py-2.5 rounded-lg text-xs font-semibold uppercase tracking-wider transition-colors ${
-                            activeTab === tab ? "text-primary" : "text-muted-foreground hover:text-foreground"
-                          }`}
+                          className={`relative flex-1 py-2.5 rounded-lg text-xs font-semibold uppercase tracking-wider transition-colors ${activeTab === tab ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                            }`}
                         >
                           {activeTab === tab && (
                             <motion.div
@@ -430,92 +480,199 @@ const Account = () => {
 
                     {/* Orders Tab */}
                     {activeTab === "orders" && (
-                      <div className="space-y-4">
+                      <div className="space-y-8">
                         <div>
                           <p className="text-sm font-medium text-primary tracking-[0.3em] uppercase mb-1">Collection</p>
                           <h2 className="text-2xl md:text-3xl font-display font-extrabold text-heading">My Orders</h2>
                         </div>
 
-                        {orders.length === 0 ? (
+                        {loadingOrders ? (
+                          <div className="text-center py-16">
+                            <Loader2 className="w-8 h-8 mx-auto animate-spin text-primary" />
+                            <p className="mt-2 text-sm text-muted-foreground">Loading orders...</p>
+                          </div>
+                        ) : orders.length === 0 ? (
                           <div className="text-center py-16 text-muted-foreground">
                             <Package className="w-12 h-12 mx-auto mb-4 opacity-30" />
                             <p className="text-lg font-medium">No orders yet</p>
                             <p className="text-sm mt-1">Your orders will appear here once you make a purchase.</p>
                           </div>
                         ) : (
-                          orders.map((order, i) => (
-                            <motion.div
-                              key={order.id}
-                              initial={{ opacity: 0, y: 30, rotateX: -5 }}
-                              animate={{ opacity: 1, y: 0, rotateX: 0 }}
-                              transition={{ delay: 0.3 + i * 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] as const }}
-                              whileHover={{ y: -4, boxShadow: "0 12px 40px -8px hsla(220,100%,40%,0.12)" }}
-                              className="rounded-2xl border border-border bg-card p-5 md:p-6 transition-all duration-300 cursor-pointer"
-                              style={{ perspective: "800px" }}
-                            >
-                              <div className="flex items-start justify-between mb-4">
-                                <div>
-                                  <p className="text-xs text-muted-foreground font-mono tracking-wider">{order.service}</p>
-                                  <h3 className="text-base font-display font-bold text-heading mt-1">{order.title}</h3>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <button
-                                    onClick={() => copyOrderId(order.id)}
-                                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-muted text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
+                          <>
+                            {/* Active Orders Section */}
+                            {activeOrders.length > 0 && (
+                              <div className="space-y-4">
+                                <h3 className="text-xl font-display font-bold text-heading flex items-center gap-2">
+                                  <Loader2 className="w-5 h-5 text-primary animate-spin-slow" />
+                                  Placed Orders
+                                </h3>
+                                {activeOrders.map((order, i) => (
+                                  <motion.div
+                                    key={order.id}
+                                    initial={{ opacity: 0, y: 30 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.1 + i * 0.1 }}
+                                    className="rounded-2xl border border-border bg-card p-5 md:p-6 shadow-sm hover:shadow-md transition-all"
                                   >
-                                    {copiedId === order.id ? <Check className="w-3 h-3 text-primary" /> : <Copy className="w-3 h-3" />}
-                                    #{order.id}
-                                  </button>
-                                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                                </div>
-                              </div>
+                                    <div className="flex items-start justify-between mb-4">
+                                      <div>
+                                        <p className="text-xs text-muted-foreground font-mono tracking-wider uppercase">{order.service_type}</p>
+                                        <h3 className="text-base font-display font-bold text-heading mt-1">Order #{order.order_number}</h3>
 
-                              <div className="space-y-2">
-                                <div className="flex items-center gap-1">
-                                  {statusSteps.map((step, si) => {
-                                    const currentIdx = getStatusIndex(order.status);
-                                    const isComplete = si <= currentIdx;
-                                    const isCurrent = si === currentIdx;
-                                    return (
-                                      <div key={step} className="flex items-center flex-1 last:flex-none">
-                                        <motion.div
-                                          initial={{ scale: 0 }}
-                                          animate={{ scale: 1 }}
-                                          transition={{ delay: 0.5 + si * 0.1, type: "spring", stiffness: 300, damping: 20 }}
-                                          className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${
-                                            isComplete
-                                              ? "bg-primary text-primary-foreground"
-                                              : "bg-muted text-muted-foreground"
-                                          } ${isCurrent ? "ring-2 ring-primary/30 ring-offset-2 ring-offset-card" : ""}`}
-                                        >
-                                          {si === 0 && <Package className="w-3 h-3" />}
-                                          {si === 1 && <Printer className="w-3 h-3" />}
-                                          {si === 2 && <Truck className="w-3 h-3" />}
-                                          {si === 3 && <Check className="w-3 h-3" />}
-                                        </motion.div>
-                                        {si < statusSteps.length - 1 && (
-                                          <div className="flex-1 h-0.5 mx-1.5 rounded-full overflow-hidden bg-muted">
-                                            <motion.div
-                                              initial={{ scaleX: 0 }}
-                                              animate={{ scaleX: isComplete && si < currentIdx ? 1 : 0 }}
-                                              transition={{ delay: 0.6 + si * 0.1, duration: 0.4 }}
-                                              className="h-full bg-primary origin-left"
-                                            />
+                                        {/* Active Order Images */}
+                                        {order.order_items?.some(item => item.user_uploads?.storage_url) && (
+                                          <div className="flex gap-2 mt-3 mb-1">
+                                            {order.order_items.map((item, idx) => (
+                                              item.user_uploads?.storage_url && (
+                                                <div key={idx} className="w-16 h-16 rounded-lg overflow-hidden border border-border shadow-sm">
+                                                  <img
+                                                    src={item.user_uploads.storage_url}
+                                                    alt="Upload"
+                                                    className="w-full h-full object-cover"
+                                                  />
+                                                </div>
+                                              )
+                                            ))}
                                           </div>
                                         )}
                                       </div>
-                                    );
-                                  })}
-                                </div>
-                                <div className="flex items-center justify-between">
-                                  <span className="text-xs text-muted-foreground font-mono">{order.date}</span>
-                                  <span className="text-sm font-display font-bold text-foreground tabular-nums">
-                                    ₹{order.price.toLocaleString()}
-                                  </span>
+                                      <div className="flex items-center gap-2">
+                                        <button
+                                          onClick={() => copyOrderId(order.order_number)}
+                                          className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-muted text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
+                                        >
+                                          {copiedId === order.order_number ? <Check className="w-3 h-3 text-primary" /> : <Copy className="w-3 h-3" />}
+                                          Copy ID
+                                        </button>
+                                        <button
+                                          onClick={() => navigate(`/orders/${order.id}`)}
+                                          className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-primary/10 text-xs font-bold uppercase tracking-wider text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+                                        >
+                                          View Details <ChevronRight className="w-3 h-3" />
+                                        </button>
+                                      </div>
+                                    </div>
+
+                                    <div className="space-y-4">
+                                      {/* Progress Bar */}
+                                      <div className="flex items-center gap-1">
+                                        {statusSteps.map((step, si) => {
+                                          const uiStatus = mapBackendStatusToUI(order.order_status);
+                                          const currentIdx = getStatusIndex(uiStatus);
+                                          const isComplete = si <= currentIdx;
+                                          const isCurrent = si === currentIdx;
+                                          return (
+                                            <div key={step} className="flex items-center flex-1 last:flex-none">
+                                              <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-300 ${isComplete ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"} ${isCurrent ? "ring-2 ring-primary/30 ring-offset-2" : ""}`}>
+                                                {si === 0 && <Package className="w-3.5 h-3.5" />}
+                                                {si === 1 && <Printer className="w-3.5 h-3.5" />}
+                                                {si === 2 && <Truck className="w-3.5 h-3.5" />}
+                                                {si === 3 && <Check className="w-3.5 h-3.5" />}
+                                              </div>
+                                              {si < statusSteps.length - 1 && (
+                                                <div className="flex-1 h-1 mx-2 rounded-full bg-muted overflow-hidden">
+                                                  <motion.div
+                                                    initial={{ scaleX: 0 }}
+                                                    animate={{ scaleX: isComplete && si < currentIdx ? 1 : 0 }}
+                                                    className="h-full bg-primary origin-left"
+                                                    transition={{ duration: 0.5 }}
+                                                  />
+                                                </div>
+                                              )}
+                                            </div>
+                                          );
+                                        })}
+                                      </div>
+
+                                      <div className="flex items-center justify-between pt-2 border-t border-border/50">
+                                        <div className="flex flex-col">
+                                          <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Status</span>
+                                          <span className="text-sm font-bold text-primary">{mapBackendStatusToUI(order.order_status)}</span>
+                                        </div>
+                                        <div className="flex flex-col items-end">
+                                          <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Total</span>
+                                          <span className="text-sm font-bold text-foreground">₹{order.total_amount.toLocaleString()}</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </motion.div>
+                                ))}
+                              </div>
+                            )}
+
+                            {/* Completed Orders Section */}
+                            {historyOrders.length > 0 && (
+                              <div className="space-y-4 pt-8">
+                                <h3 className="text-xl font-display font-bold text-heading flex items-center gap-2">
+                                  <Check className="w-5 h-5 text-emerald-500" />
+                                  Completed Orders
+                                </h3>
+                                <div className="space-y-3">
+                                  {historyOrders.map((order) => (
+                                    <div key={order.id} className="group flex items-center justify-between p-4 rounded-xl border border-border bg-card/50 hover:bg-card hover:border-border/80 transition-all">
+                                      <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
+                                          {order.order_status === 'cancelled' ? <X className="w-5 h-5" /> : <Check className="w-5 h-5 text-emerald-600" />}
+                                        </div>
+                                        <div>
+                                          <h4 className="font-bold text-foreground text-sm">{order.service_type}</h4>
+                                          <p className="text-xs text-muted-foreground">
+                                            #{order.order_number} · {new Date(order.created_at).toLocaleDateString()}
+                                          </p>
+
+                                          {/* Render Image Thumbnail */}
+                                          <div className="flex gap-2 mt-2">
+                                            {order.order_items?.map((item, idx) => (
+                                              item.user_uploads?.storage_url && (
+                                                <div key={idx} className="w-12 h-12 rounded-md overflow-hidden border border-border">
+                                                  <img
+                                                    src={item.user_uploads.storage_url}
+                                                    alt="Order Upload"
+                                                    className="w-full h-full object-cover"
+                                                  />
+                                                </div>
+                                              )
+                                            ))}
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                      <div className="flex items-center gap-4">
+                                        <span className="text-sm font-bold text-foreground hidden sm:block">
+                                          ₹{order.total_amount}
+                                        </span>
+                                        <button
+                                          onClick={() => navigate(`/orders/${order.id}`)}
+                                          className="px-3 py-1.5 rounded-lg border border-border text-xs font-bold uppercase tracking-wider hover:bg-accent transition-colors"
+                                        >
+                                          Details
+                                        </button>
+                                        <button
+                                          onClick={() => {
+                                            const routeMap: Record<string, string> = {
+                                              "passphoto": "/studio/passphoto",
+                                              "photocopies": "/studio/photocopies",
+                                              "frames": "/studio/frames",
+                                              "album": "/studio/album",
+                                              "snapnprint": "/studio/snapnprint"
+                                            };
+                                            // Normalize service type to lowercase and remove spaces for matching
+                                            const key = order.service_type.toLowerCase().replace(/\s+/g, '');
+                                            // Find matching route or default to studio
+                                            const route = Object.entries(routeMap).find(([k]) => key.includes(k))?.[1] || "/studio";
+                                            navigate(route);
+                                          }}
+                                          className="px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider hover:bg-primary hover:text-primary-foreground transition-colors"
+                                        >
+                                          Book Again
+                                        </button>
+                                      </div>
+                                    </div>
+                                  ))}
                                 </div>
                               </div>
-                            </motion.div>
-                          ))
+                            )}
+                          </>
                         )}
                       </div>
                     )}
@@ -537,9 +694,9 @@ const Account = () => {
                 </div>
               </motion.div>
             )}
-          </AnimatePresence>
-        </div>
-      </motion.main>
+          </AnimatePresence >
+        </div >
+      </motion.main >
     </>
   );
 };

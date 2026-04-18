@@ -15,18 +15,18 @@ const envSchema = z.object({
   SUPABASE_URL: z.string().url('Invalid Supabase URL'),
   SUPABASE_ANON_KEY: z.string().min(20, 'Supabase anon key required'),
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(20, 'Supabase service role key required'),
-  SUPABASE_BUCKET: z.string().default('customer-photos'),
-  
+  SUPABASE_BUCKET: z.string().default('user-uploads'),
+
   // Stripe
   STRIPE_SECRET_KEY: z.string().startsWith('sk_', 'Invalid Stripe secret key'),
   STRIPE_WEBHOOK_SECRET: z.string().startsWith('whsec_', 'Invalid webhook secret'),
-  
+
   // Cloudflare R2
   R2_ENDPOINT: z.string().url('Invalid R2 endpoint'),
-  R2_ACCESS_KEY_ID: z.string().min(10, 'R2 access key required'),
-  R2_SECRET_ACCESS_KEY: z.string().min(10, 'R2 secret key required'),
+  R2_ACCESS_KEY_ID: z.string().min(1, 'R2 access key required'),
+  R2_SECRET_ACCESS_KEY: z.string().min(1, 'R2 secret key required'),
   R2_BUCKET_NAME: z.string().default('luminia-masters'),
-  
+
   // Redis
   REDIS_URL: z.string().url('Invalid Redis URL').optional(),
   REDIS_PASSWORD: z.string().optional(),

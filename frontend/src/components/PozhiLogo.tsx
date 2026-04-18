@@ -8,8 +8,8 @@ interface PozhiLogoProps {
 }
 
 const PozhiLogo = ({ size = "nav", layoutId }: PozhiLogoProps) => {
-  // 2. Size logic malli add chesa, lekapothe image control lo undadu
-  const dimensions = size === "large" ? { width: 280, height: 280 } : { width: 98, height: 98 };
+  // 2. Reduced 'nav' size for better balance (from 98 to 42)
+  const dimensions = size === "large" ? { width: 280, height: 280 } : { width: 42, height: 42 };
 
   return (
     <motion.div

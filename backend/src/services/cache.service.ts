@@ -19,7 +19,7 @@ class MemoryCache {
   // 🛡️ CRITICAL FIX: Handle generic calls (like Lua scripts for Rate Limiting)
   async call(command: string, ...args: any[]): Promise<any> {
     const cmd = command.toUpperCase();
-    
+
     // Handle Lua Script Execution (Used by rate-limit-redis)
     // Returns [count, ttl_ms] to satisfy the library
     if (cmd === 'EVAL' || cmd === 'EVALSHA') {
@@ -40,7 +40,7 @@ class MemoryCache {
       case 'EXPIRE': return this.expire(args[0], args[1]);
       case 'TTL': return this.ttl(args[0]);
       case 'EXISTS': return this.exists(args[0]);
-      default: 
+      default:
         return 'OK';
     }
   }
@@ -77,9 +77,9 @@ class MemoryCache {
   async incr(key: string): Promise<number> {
     const current = await this.get(key);
     const newVal = (parseInt(current || '0', 10) + 1).toString();
-    this.store.set(key, { 
-      value: newVal, 
-      expiry: this.store.get(key)?.expiry || null 
+    this.store.set(key, {
+      value: newVal,
+      expiry: this.store.get(key)?.expiry || null
     });
     return parseInt(newVal, 10);
   }
@@ -135,7 +135,7 @@ const client = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
     // If we failed more than 3 times, slow down retries to every 5 seconds
     // This stops the logs from being flooded
     if (times > 3) {
-      return 5000; 
+      return 5000;
     }
     return Math.min(times * 100, 1000);
   },
@@ -166,15 +166,15 @@ redisClient = new Proxy(client, {
     if (isRedisReady) {
       return Reflect.get(target, prop);
     }
-    
+
     // Otherwise, check if fallback has this method
     const fallbackValue = (memoryFallback as any)[prop];
-    
+
     // If fallback has it, use it
     if (typeof fallbackValue === 'function') {
       return fallbackValue.bind(memoryFallback);
     }
-    
+
     // If it's a property (like 'status'), return fallback value
     if (fallbackValue !== undefined) {
       return fallbackValue;
@@ -191,15 +191,15 @@ redisClient = new Proxy(client, {
 
 export const cacheService = {
   async get(key: string) {
-    try { return await redisClient.get(key); } 
+    try { return await redisClient.get(key); }
     catch { return memoryFallback.get(key); }
   },
   async set(key: string, value: string, ttl = 300) {
-    try { await redisClient.setex(key, ttl, value); } 
+    try { await redisClient.setex(key, ttl, value); }
     catch { await memoryFallback.setex(key, ttl, value); }
   },
   async del(key: string) {
-    try { await redisClient.del(key); } 
+    try { await redisClient.del(key); }
     catch { await memoryFallback.del(key); }
   },
   async exists(key: string) {

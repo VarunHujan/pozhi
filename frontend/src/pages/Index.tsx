@@ -5,6 +5,7 @@ import LoadingScreen from "@/components/LoadingScreen";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import CurtainTransition from "@/components/CurtainTransition";
+import CursorGlow from "@/components/CursorGlow";
 
 const Index = () => {
   const [loading, setLoading] = useState(true);
@@ -26,25 +27,27 @@ const Index = () => {
   }, [navigate]);
 
   return (
-    <LayoutGroup>
-      <AnimatePresence>
-        {loading && <LoadingScreen onComplete={handleLoadingComplete} />}
-      </AnimatePresence>
+    <>
+      <LayoutGroup>
+        <AnimatePresence>
+          {loading && <LoadingScreen onComplete={handleLoadingComplete} />}
+        </AnimatePresence>
 
-      <CurtainTransition
-        isActive={transitioning}
-        onComplete={handleTransitionComplete}
-      />
-
-      <Navbar visible={contentVisible} />
-
-      <main>
-        <HeroSection
-          visible={contentVisible}
-          onEnterStudio={handleEnterStudio}
+        <CurtainTransition
+          isActive={transitioning}
+          onComplete={handleTransitionComplete}
         />
-      </main>
-    </LayoutGroup>
+
+        <Navbar visible={contentVisible} />
+
+        <main>
+          <HeroSection
+            visible={contentVisible}
+            onEnterStudio={handleEnterStudio}
+          />
+        </main>
+      </LayoutGroup>
+    </>
   );
 };
 

@@ -6,7 +6,6 @@ import Navbar from "@/components/Navbar";
 import BookPreview from "@/components/album/BookPreview";
 import CapacitySelector from "@/components/album/CapacitySelector";
 import CoverTypeToggle from "@/components/album/CoverTypeToggle";
-import CoverUploadZone from "@/components/album/CoverUploadZone";
 import { fetchAlbumPricing, type AlbumCapacity } from "@/services/api";
 
 export type CoverType = "basic" | "custom";
@@ -24,6 +23,7 @@ const Album = () => {
   const [frontImage, setFrontImage] = useState<string | null>(null);
   const [backImage, setBackImage] = useState<string | null>(null);
   const [isFlipped, setIsFlipped] = useState(false);
+  const [uploadId, setUploadId] = useState<string | null>(null);
 
   // Fetch pricing
   useEffect(() => {
@@ -62,9 +62,21 @@ const Album = () => {
   const handleBuyNow = () => {
     if (!currentCapacity) return;
 
+    // 🛑 VALIDATION: Image upload is mandatory
+    if (!uploadId) {
+      alert("Please upload your photos for the album to continue.");
+      return;
+    }
+
+    if (coverType === 'custom' && (!frontImage || !backImage)) {
+      alert("Please upload both front and back cover images for custom cover.");
+      return;
+    }
+
     navigate("/checkout", {
       state: {
         service: "Album",
+        uploadId: uploadId,
         title: `Premium Album — ${currentCapacity.label}`,
         details: [
           { label: "Capacity", value: currentCapacity.label },
@@ -140,6 +152,10 @@ const Album = () => {
                 frontImage={frontImage}
                 backImage={backImage}
                 onFlip={setIsFlipped}
+                onUploadFront={(id, url) => { setFrontImage(url); handleCoverTypeChange('custom'); }}
+                onUploadBack={(id, url) => { setBackImage(url); handleCoverTypeChange('custom'); }}
+                onClearFront={() => setFrontImage(null)}
+                onClearBack={() => setBackImage(null)}
               />
             </motion.div>
 
@@ -195,7 +211,7 @@ const Album = () => {
                 />
               </div>
 
-              {/* Step 2: Cover Type */}
+              {/* Step 2: Cover Design */}
               <div>
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
                   Step 2 — Cover Design
@@ -206,47 +222,18 @@ const Album = () => {
                 />
               </div>
 
-              {/* Upload zones (only visible when "custom" is selected) */}
-              <AnimatePresence>
-                {coverType === "custom" && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                    className="overflow-hidden"
+              <div className="pt-8 mt-auto border-t border-border">
+                <div className="flex items-center justify-between mb-6">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={handleBuyNow}
+                    className="w-full flex items-center justify-center gap-3 py-4 px-8 bg-primary text-primary-foreground font-display font-bold text-lg rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300"
                   >
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                      <CoverUploadZone
-                        label="Front Cover"
-                        image={frontImage}
-                        onUpload={setFrontImage}
-                        onClear={() => setFrontImage(null)}
-                        onFocus={() => setIsFlipped(false)}
-                      />
-                      <CoverUploadZone
-                        label="Back Cover"
-                        image={backImage}
-                        onUpload={setBackImage}
-                        onClear={() => setBackImage(null)}
-                        onFocus={() => setIsFlipped(true)}
-                      />
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* CTA — desktop */}
-              <div className="hidden lg:block pt-4">
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={handleBuyNow}
-                  className="w-full flex items-center justify-center gap-3 py-4 px-8 bg-primary text-primary-foreground font-display font-bold text-lg rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300"
-                >
-                  <ShoppingCart className="w-5 h-5" />
-                  Buy Now
-                </motion.button>
+                    <ShoppingCart className="w-5 h-5" />
+                    Buy Now
+                  </motion.button>
+                </div>
               </div>
             </motion.div>
           </div>

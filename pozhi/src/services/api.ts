@@ -210,7 +210,8 @@ export async function uploadFiles(files: File[]) {
         method: 'POST',
         body: formData,
         headers: {
-            // Authorization header will be added when auth is implemented
+            // Authorization header
+            ...authHeaders()
         }
     });
 
@@ -224,6 +225,25 @@ export async function uploadFiles(files: File[]) {
 // ==========================================
 // ORDERS API
 // ==========================================
+
+export interface Order {
+    id: string;
+    order_number: string;
+    service_type: string;
+    total_amount: number;
+    payment_status: string;
+    order_status: string;
+    created_at: string;
+    order_items?: {
+        id: string;
+        item_details: any;
+        user_upload_id?: string;
+        user_uploads?: {
+            storage_url: string;
+            original_filename: string;
+        };
+    }[];
+}
 
 export async function createOrder(orderData: any) {
     const response = await fetch(`${API_BASE_URL}/orders`, {
@@ -240,6 +260,60 @@ export async function createOrder(orderData: any) {
     }
 
     return await response.json();
+}
+
+export async function fetchUserOrders(): Promise<Order[]> {
+    const response = await fetch(`${API_BASE_URL}/orders`, {
+        headers: authHeaders()
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to fetch orders');
+    }
+
+    const data = await response.json();
+    return data.data; // Backend returns { success: true, data: [...] }
+}
+
+export async function fetchAllOrders(): Promise<Order[]> {
+    const response = await fetch(`${API_BASE_URL}/orders/admin/all`, {
+        headers: authHeaders()
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to fetch admin orders');
+    }
+
+    const data = await response.json();
+    return data.data;
+}
+
+export async function fetchOrderById(orderId: string): Promise<Order> {
+    const response = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
+        headers: authHeaders()
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to fetch order details');
+    }
+
+    const data = await response.json();
+    return data.data;
+}
+
+export async function updateOrderStatus(id: string, status: string): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/orders/${id}/status`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            ...authHeaders()
+        },
+        body: JSON.stringify({ order_status: status })
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to update order status');
+    }
 }
 
 // ==========================================
@@ -264,6 +338,8 @@ export interface AuthUser {
     email: string;
     full_name: string;
     role: string;
+    phone?: string;
+    avatar_url?: string;
 }
 
 export interface AuthSession {

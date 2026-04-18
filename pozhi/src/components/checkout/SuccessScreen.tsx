@@ -7,6 +7,8 @@ import { toast } from "sonner";
 interface SuccessScreenProps {
   userName: string;
   mobile: string;
+  orderId?: string;
+  orderNumber?: string;
 }
 
 /* ---------- Confetti particle ---------- */
@@ -47,15 +49,17 @@ const Particle = ({ index }: { index: number }) => {
   );
 };
 
-const SuccessScreen = ({ userName, mobile }: SuccessScreenProps) => {
+const SuccessScreen = ({ userName, mobile, orderId, orderNumber }: SuccessScreenProps) => {
   const navigate = useNavigate();
-  const orderId = useMemo(
-    () => `PZ-${String(Math.floor(100000 + Math.random() * 900000))}`,
-    []
+  // Use real order number if available, else fallback to random (only for dev/testing)
+  const displayOrderId = useMemo(
+    () => orderNumber || `PZ-${String(Math.floor(100000 + Math.random() * 900000))}`,
+    [orderNumber]
   );
 
   const copyId = () => {
-    navigator.clipboard.writeText(orderId);
+    navigator.clipboard.writeText(displayOrderId);
+
     toast.success("Order ID copied!");
   };
 
@@ -165,7 +169,7 @@ const SuccessScreen = ({ userName, mobile }: SuccessScreenProps) => {
           Order
         </span>
         <span className="text-lg font-display font-extrabold text-foreground tracking-wide">
-          #{orderId}
+          #{displayOrderId}
         </span>
         <Copy className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
       </motion.button>
@@ -190,7 +194,7 @@ const SuccessScreen = ({ userName, mobile }: SuccessScreenProps) => {
         <motion.button
           whileHover={{ scale: 1.04 }}
           whileTap={{ scale: 0.96 }}
-          onClick={() => navigate("/studio")}
+          onClick={() => orderId ? navigate(`/orders/${orderId}`) : navigate("/account")}
           className="flex items-center gap-2 px-6 py-3 rounded-xl border border-border bg-card text-foreground font-medium text-sm hover:bg-accent transition-colors"
         >
           <FileText className="w-4 h-4" />

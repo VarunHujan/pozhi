@@ -1,126 +1,119 @@
 import { motion } from "framer-motion";
-import { Sparkles, Cpu, Zap, Camera } from "lucide-react";
+import { Sparkles, Cpu, Zap, Camera, ShieldCheck, CornerRightDown } from "lucide-react";
 import Navbar from "@/components/Navbar";
 
 const roadmapItems = [
   {
     icon: Cpu,
-    title: "AI Photo Editing",
+    title: "AI Retouching Core",
     description:
-      "Intelligent retouching and enhancement powered by machine learning.",
+      "Intelligent neural enhancement protocols. Real-time skin correction, background synthesis, and archival style transfer.",
     status: "In Development",
+    statusColor: "text-orange-600/80 bg-orange-100/10 border-orange-200/20",
   },
   {
     icon: Camera,
-    title: "Drone Photography",
+    title: "Aerial Reconnaissance",
     description:
-      "Aerial shots for events, architecture, and landscape coverage.",
+      "Cinematic drone deployments for events, architecture, and landscape coverage. High-altitude perspectives redefined.",
     status: "Coming 2026",
+    statusColor: "text-foreground/40 bg-foreground/[0.03] border-foreground/[0.05]",
   },
   {
     icon: Sparkles,
-    title: "AR Frame Preview",
+    title: "AR Volumetric Preview",
     description:
-      "See how your framed photo looks on your wall before ordering.",
+      "Visualize your archival frames on-site with millimeter-precise AR placement. Real-time lighting integration for true fidelity.",
     status: "Research",
+    statusColor: "text-foreground/30 bg-foreground/[0.02] border-foreground/[0.04]",
   },
   {
     icon: Zap,
-    title: "Instant Delivery",
+    title: "Zero Latency Delivery",
     description:
-      "Same-hour printing and delivery for urgent passport photo needs.",
+      "Hyper-speed local printing and courier deployment. Archival prints delivered to your coordinate within the hour.",
     status: "Planned",
+    statusColor: "text-foreground/20 bg-foreground/[0.01] border-foreground/[0.03]",
   },
 ];
-
-const cardVariants = {
-  initial: { opacity: 0, x: -40, rotateY: -8 },
-  animate: (i: number) => ({
-    opacity: 1,
-    x: 0,
-    rotateY: 0,
-    transition: {
-      duration: 0.7,
-      delay: i * 0.15 + 0.2,
-      ease: [0.22, 1, 0.36, 1] as const,
-    },
-  }),
-};
-
-const dotVariants = {
-  initial: { scale: 0 },
-  animate: (i: number) => ({
-    scale: 1,
-    transition: {
-      type: "spring" as const,
-      stiffness: 400,
-      damping: 15,
-      delay: i * 0.15 + 0.1,
-    },
-  }),
-};
 
 const Future = () => {
   return (
     <>
       <Navbar visible={true} />
 
+      {/* Ambient warm lighting — Light Luxe Atmosphere */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden bg-background">
+        <div className="absolute top-[30%] left-[-10%] w-[900px] h-[900px] bg-orange-50/20 rounded-full blur-[160px]" />
+        <div className="absolute bottom-[0%] right-[-5%] w-[600px] h-[600px] bg-blue-50/10 rounded-full blur-[140px]" />
+        
+        {/* Tactical Light Grid */}
+        <div
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: "80px 80px",
+          }}
+        />
+      </div>
+
       <motion.main
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="pt-28 pb-32 px-6 md:px-12 min-h-screen relative overflow-hidden"
+        transition={{ duration: 1 }}
+        className="relative z-10 pt-32 pb-40 px-6 md:px-12"
       >
-        {/* Subtle gradient backdrop */}
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-primary/5 pointer-events-none" />
-
-        <div className="max-w-4xl mx-auto relative z-10">
+        <div className="max-w-5xl mx-auto">
+          {/* Header Section — Editorial Manifest */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] as const }}
+            transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] as const }}
+            className="mb-32"
           >
-            <p className="text-sm font-medium text-primary tracking-[0.3em] uppercase mb-4">
-              What's Next
+            <p className="text-[10px] font-body font-black text-muted-foreground/60 tracking-[0.5em] uppercase mb-12">
+              VISION // NEXT GENERATION
             </p>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-extrabold text-heading leading-tight mb-4">
-              <motion.span
-                animate={{ opacity: [1, 0.4, 1] }}
-                transition={{
-                  duration: 2.5,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-                className="inline-block"
+
+            <div className="overflow-hidden mb-8">
+              <motion.h1
+                initial={{ y: 120 }}
+                animate={{ y: 0 }}
+                transition={{ duration: 1.2, delay: 0.1, ease: [0.22, 1, 0.36, 1] as const }}
+                className="text-4xl md:text-6xl lg:text-7xl font-heading font-black text-heading leading-[0.85] tracking-tighter"
               >
-                The Future
-              </motion.span>
-            </h1>
+                The <span className="text-foreground/10 italic">Future.</span>
+              </motion.h1>
+            </div>
+
             <motion.p
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.6 }}
-              className="text-lg text-muted-foreground max-w-2xl mb-6"
+              transition={{ delay: 0.4, duration: 1 }}
+              className="text-sm md:text-md text-muted-foreground/60 max-w-lg leading-relaxed font-body font-bold uppercase tracking-[0.2em] opacity-80"
             >
-              We're constantly pushing boundaries. Here's a glimpse of what's
-              coming to Pozhi.
+              We are synthesizing the next frontier of optical excellence. A blueprint for innovations in imaging, access, and secure archival experiences.
             </motion.p>
+
             <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: "4rem" }}
-              transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] as const }}
-              className="h-1 bg-primary rounded-full mb-16"
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ duration: 1.5, delay: 0.6, ease: [0.22, 1, 0.36, 1] as const }}
+              className="mt-12 h-px bg-foreground/[0.05] origin-left shadow-sm"
             />
           </motion.div>
 
-          {/* Timeline */}
-          <div className="relative" style={{ perspective: "1000px" }}>
-            {/* Vertical line with draw-in effect */}
+          {/* Timeline — Tactical Roadmap */}
+          <div className="relative">
+            {/* Animated vertical timeline line */}
             <motion.div
               initial={{ scaleY: 0 }}
               animate={{ scaleY: 1 }}
-              transition={{ duration: 1.2, delay: 0.3, ease: [0.22, 1, 0.36, 1] as const }}
-              className="absolute left-6 top-0 bottom-0 w-px bg-border origin-top"
+              transition={{ duration: 2, delay: 0.8, ease: [0.22, 1, 0.36, 1] as const }}
+              className="absolute left-[38px] top-0 bottom-0 w-px origin-top bg-gradient-to-b from-foreground/10 via-foreground/[0.03] to-transparent shadow-sm"
             />
 
             <div className="space-y-12">
@@ -129,54 +122,70 @@ const Future = () => {
                 return (
                   <motion.div
                     key={item.title}
-                    variants={cardVariants}
-                    initial="initial"
-                    whileInView="animate"
-                    viewport={{ once: true, margin: "-50px" }}
-                    custom={i}
-                    className="relative pl-16"
+                    initial={{ opacity: 0, x: -40 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true, margin: "-100px" }}
+                    transition={{
+                      duration: 1,
+                      delay: i * 0.15,
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
+                    className="relative pl-24 group"
                   >
-                    {/* Timeline dot */}
+                    {/* Timeline dot — Cinematic Pulse */}
                     <motion.div
-                      variants={dotVariants}
-                      initial="initial"
-                      whileInView="animate"
+                      initial={{ scale: 0 }}
+                      whileInView={{ scale: 1 }}
                       viewport={{ once: true }}
-                      custom={i}
-                      className="absolute left-3 top-2 w-6 h-6 rounded-full bg-primary/10 border-2 border-primary flex items-center justify-center"
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 20,
+                        delay: i * 0.15 + 0.3,
+                      }}
+                      className="absolute left-6 top-6 w-8 h-8 rounded-full border border-foreground/[0.05] bg-background flex items-center justify-center shadow-lg"
                     >
-                      <div className="w-2 h-2 rounded-full bg-primary" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-foreground/20 group-hover:bg-foreground transition-all duration-500" />
                     </motion.div>
 
+                    {/* Roadmap Card — High-End Ivory */}
                     <motion.div
-                      whileHover={{ y: -4, scale: 1.01 }}
-                      transition={{ duration: 0.25 }}
-                      className="p-6 rounded-2xl border border-border bg-card hover:border-primary/20 hover:shadow-[0_8px_30px_-8px_hsla(220,100%,40%,0.12)] transition-all duration-300"
+                      whileHover={{ y: -8, scale: 1.01 }}
+                      className="p-10 md:p-12 rounded-[40px] border border-foreground/[0.03] bg-card hover:border-foreground/10 transition-all duration-700 shadow-2xl shadow-black/[0.01] relative overflow-hidden"
                     >
-                      <div className="flex items-start justify-between mb-3 gap-3">
-                        <div className="flex items-center gap-3">
+                       {/* Paper texture */}
+                        <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-multiply" 
+                            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")` }} />
+
+                      {/* Content hierarchy */}
+                      <div className="flex flex-col md:flex-row md:items-start justify-between gap-8 mb-8 relative z-10">
+                        <div className="flex items-center gap-6">
                           <motion.div
                             whileHover={{ rotate: 12, scale: 1.1 }}
-                            transition={{ type: "spring", stiffness: 300 }}
-                            className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0"
+                            className="w-16 h-16 rounded-[22px] bg-foreground/[0.03] border border-foreground/[0.05] flex items-center justify-center flex-shrink-0 transition-all duration-500 group-hover:bg-foreground group-hover:text-background"
                           >
-                            <Icon className="w-5 h-5 text-primary" />
+                            <Icon className="w-6 h-6 text-foreground/40 group-hover:text-background transition-all duration-500" />
                           </motion.div>
-                          <h3 className="text-xl font-display font-bold text-heading">
-                            {item.title}
-                          </h3>
+                          <div>
+                             <div className="flex items-center gap-3 mb-2 opacity-20">
+                                <CornerRightDown className="w-3 h-3" />
+                                <span className="text-[9px] font-mono tracking-widest uppercase mb-0.5">Deployment Sector</span>
+                             </div>
+                             <h3 className="text-2xl md:text-3xl font-heading font-black text-heading tracking-tighter">
+                                {item.title}
+                             </h3>
+                          </div>
                         </div>
-                        <motion.span
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          whileInView={{ opacity: 1, scale: 1 }}
-                          viewport={{ once: true }}
-                          transition={{ delay: i * 0.15 + 0.4, type: "spring", stiffness: 300 }}
-                          className="text-xs font-medium text-primary bg-accent px-3 py-1 rounded-full whitespace-nowrap flex-shrink-0"
+
+                        {/* Status badge — Archival Label */}
+                        <span
+                          className={`text-[10px] font-heading font-black tracking-[0.3em] uppercase px-5 py-2.5 rounded-full border shadow-sm ${item.statusColor} flex-shrink-0 transition-all duration-700`}
                         >
                           {item.status}
-                        </motion.span>
+                        </span>
                       </div>
-                      <p className="text-muted-foreground leading-relaxed">
+
+                      <p className="text-sm md:text-base text-muted-foreground/60 leading-[1.6] font-body font-bold uppercase tracking-widest opacity-80 relative z-10 max-w-2xl">
                         {item.description}
                       </p>
                     </motion.div>
@@ -185,6 +194,23 @@ const Future = () => {
               })}
             </div>
           </div>
+
+          {/* Bottom teaser — Signature Visual */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1, delay: 0.5, ease: [0.22, 1, 0.36, 1] as const }}
+            className="mt-32 text-center"
+          >
+             <div className="h-px w-24 bg-foreground/10 mx-auto mb-10" />
+             <div className="flex items-center justify-center gap-4 opacity-20 hover:opacity-100 transition-opacity duration-1000">
+                <ShieldCheck className="w-4 h-4" />
+                <p className="text-[10px] text-foreground font-heading font-black tracking-[0.5em] uppercase">
+                ADVANCED OPTICAL LABS // POZHI.NEXT
+                </p>
+             </div>
+          </motion.div>
         </div>
       </motion.main>
     </>

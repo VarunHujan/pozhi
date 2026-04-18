@@ -93,9 +93,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         const { user: currentUser } = await getCurrentUser();
         if (mounted) setUser(currentUser);
-      } catch {
-        clearSession();
-        if (mounted) setUser(null);
+      } catch (error) {
+        console.error("Session restoration failed:", error);
+        // Only clear if it's a 401 (Unauthorized) or 403 (Forbidden)
+        // If it's a network error or 500, KEEP the token to retry later
+        if (error instanceof Error && (error.message.includes('401') || error.message.includes('403'))) {
+          // 🔄 AUTO-HEAL: If access token is expired, try to refresh it using the Refresh Token
+          try {
+            console.log("Access token expired, attempting to refresh...");
+            const rt = getStoredRefreshToken();
+            if (rt) {
+              const { session } = await apiRefreshToken(rt);
+              storeSession(session);
+
+              // Retry getting the user with the new token
+              const { user: currentUser } = await getCurrentUser();
+              if (mounted) setUser(currentUser);
+              return; // Success!
+            }
+          } catch (refreshError) {
+            console.error("Auto-heal failed:", refreshError);
+            // If refresh also fails, THEN log out
+            clearSession();
+            if (mounted) setUser(null);
+          }
+
+          // If no RT or refresh failed (already handled in catch above logic fallback)
+          if (!getStoredRefreshToken()) {
+            clearSession();
+            if (mounted) setUser(null);
+          }
+        }
+        // Otherwise, keep the token but maybe set user to null temporarily or show error state
       } finally {
         if (mounted) setIsLoading(false);
       }

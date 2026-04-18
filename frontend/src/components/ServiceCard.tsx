@@ -12,49 +12,72 @@ interface ServiceCardProps {
   onClick?: () => void;
 }
 
-const ServiceCard = ({ title, description, icon: Icon, image, index, className = "", onClick }: ServiceCardProps) => {
+const ServiceCard = ({
+  title,
+  description,
+  icon: Icon,
+  image,
+  index,
+  className = "",
+  onClick,
+}: ServiceCardProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.6, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
-      whileHover={{ y: -8 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ duration: 1, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
+      whileHover={{ y: -8, scale: 1.02 }}
       onClick={onClick}
-      className={`group relative bg-card rounded-2xl border border-border/60 shadow-sm hover:shadow-[0_12px_40px_-8px_hsla(220,100%,40%,0.15)] transition-all duration-500 cursor-pointer overflow-hidden ${className}`}
+      className={`group relative rounded-3xl border border-white/10 overflow-hidden cursor-pointer transition-all duration-700 glass-pro shadow-2xl shadow-black/[0.02] ${className}`}
     >
-      {/* Service Image */}
+      {/* Image with light editorial overlay */}
       {image && (
-        <div className="relative w-full h-44 md:h-48 overflow-hidden">
+        <div className="relative w-full h-52 overflow-hidden">
           <motion.img
             src={image}
             alt={title}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            className="w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110"
+            style={{ filter: "contrast(1.05) brightness(1.02) saturate(1.1)" }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-transparent" />
+          {/* Transparent Gradient Fade */}
+          <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent" />
+          {/* Subtle paper grain texture */}
+          <div className="absolute inset-0 opacity-[0.03] mix-blend-multiply pointer-events-none" 
+               style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")` }} />
         </div>
       )}
 
-      {/* Hover background */}
-      <div className="absolute inset-0 bg-accent/0 group-hover:bg-accent/30 rounded-2xl transition-colors duration-500 pointer-events-none" />
-
+      {/* Content */}
       <div className="relative z-10 p-8 md:p-10">
-        <div className="flex items-start justify-between mb-5">
-          <div className="w-11 h-11 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/15 transition-colors duration-300">
-            <Icon className="w-5 h-5 text-primary" />
+        {/* Icon + Arrow row */}
+        <div className="flex items-start justify-between mb-8">
+          <div className="w-12 h-12 rounded-2xl bg-foreground/5 border border-foreground/5 flex items-center justify-center group-hover:bg-foreground group-hover:border-foreground transition-all duration-500">
+            <Icon className="w-5 h-5 text-foreground/60 group-hover:text-background transition-colors duration-500" />
           </div>
-          <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
-            <ArrowUpRight className="w-5 h-5 text-primary-foreground" />
+
+          {/* Arrow icon — scale & rotate in on hover */}
+          <div className="w-11 h-11 rounded-full border border-foreground/10 flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:rotate-0 -rotate-45 group-hover:translate-x-0 translate-x-4 transition-all duration-700">
+            <ArrowUpRight className="w-5 h-5 text-foreground" />
           </div>
         </div>
 
-        <h3 className="text-xl md:text-2xl font-display font-bold text-heading mb-3">
+        {/* Title — High contrast Serif */}
+        <h3 className="text-2xl md:text-3xl font-heading font-black text-heading mb-4 tracking-tight leading-none transition-transform duration-500 group-hover:translate-x-1">
           {title}
         </h3>
-        <p className="text-muted-foreground leading-relaxed">
+
+        {/* Description — Muted sans */}
+        <p className="text-sm text-muted-foreground/80 leading-relaxed font-body max-w-[260px] opacity-80 group-hover:opacity-100 transition-opacity duration-500">
           {description}
         </p>
+
+        {/* Bottom accent line — Cinematic Reveal */}
+        <div className="mt-10 h-[2px] w-0 bg-foreground/10 group-hover:w-full transition-all duration-1000 ease-[0.22,1,0.36,1]" />
       </div>
+
+      {/* Subtle border bleed */}
+      <div className="absolute inset-0 border border-foreground/[0.02] rounded-2xl pointer-events-none" />
     </motion.div>
   );
 };

@@ -1,150 +1,222 @@
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
+
+const statItems = [
+  { value: 5, suffix: "+", label: "Years of craft" },
+  { value: 2400, suffix: "+", label: "Portraits taken" },
+  { value: 98, suffix: "%", label: "Client satisfaction" },
+  { value: 12, suffix: "K+", label: "Prints delivered" },
+];
+
+function useCountUp(target: number, active: boolean): number {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    if (!active) return;
+    let start = 0;
+    const duration = 1800;
+    const startTime = performance.now();
+    const tick = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // Ease out cubic
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.floor(eased * target));
+      if (progress < 1) requestAnimationFrame(tick);
+      else setCount(target);
+    };
+    requestAnimationFrame(tick);
+  }, [target, active]);
+  return count;
+}
+
+const StatCard = ({
+  value,
+  suffix,
+  label,
+  delay,
+}: {
+  value: number;
+  suffix: string;
+  label: string;
+  delay: number;
+}) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState(false);
+  const count = useCountUp(value, active);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setActive(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.4 }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
+      className="flex flex-col"
+    >
+      <span className="text-4xl md:text-6xl font-heading font-black text-heading tracking-tight tabular-nums">
+        {count}
+        {suffix}
+      </span>
+      <span className="text-[10px] text-muted-foreground/40 tracking-[0.4em] uppercase mt-2 font-body font-bold">
+        {label}
+      </span>
+    </motion.div>
+  );
+};
 
 const textLines = [
   "We are Pozhi.",
   "Capturing moments,",
   "framing memories.",
-  "Every photograph tells a story —",
-  "we make sure it's told beautifully.",
+  "Every image a manifest —",
+  "archived beautifully.",
 ];
-
-const containerVariants = {
-  initial: {},
-  animate: {
-    transition: { staggerChildren: 0.12, delayChildren: 0.2 },
-  },
-};
-
-const lineVariants = {
-  initial: { opacity: 0, y: 60, skewY: 3 },
-  animate: {
-    opacity: 1,
-    y: 0,
-    skewY: 0,
-    transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] as const },
-  },
-};
-
-const sectionReveal = {
-  initial: { opacity: 0, y: 40, scale: 0.97 },
-  whileInView: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] as const },
-  },
-};
 
 const About = () => {
   return (
     <>
       <Navbar visible={true} />
 
+      {/* Ambient warm lighting */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden bg-background">
+        <div className="absolute top-[10%] left-[-10%] w-[800px] h-[800px] bg-orange-50/20 rounded-full blur-[160px]" />
+        <div className="absolute bottom-[20%] right-[-5%] w-[600px] h-[600px] bg-blue-50/10 rounded-full blur-[140px]" />
+      </div>
+
       <motion.main
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="pt-28 pb-32 px-6 md:px-12"
+        transition={{ duration: 1 }}
+        className="relative z-10 pt-32 pb-40 px-6 md:px-12"
       >
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-5xl mx-auto">
+          {/* Eyebrow */}
           <motion.p
-            initial={{ opacity: 0, x: -30 }}
+            initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] as const }}
-            className="text-sm font-medium text-primary tracking-[0.3em] uppercase mb-6"
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            className="text-[10px] font-body font-black text-muted-foreground/60 tracking-[0.5em] uppercase mb-12"
           >
-            About Us
+            THE ARTISAN MANIFESTO
           </motion.p>
 
-          {/* Editorial stagger text with skew reveal */}
-          <motion.div
-            variants={containerVariants}
-            initial="initial"
-            animate="animate"
-            className="space-y-4 md:space-y-6 mb-16 overflow-hidden"
-          >
+          {/* Editorial headline lines — clip reveal */}
+          <div className="space-y-4 mb-24">
             {textLines.map((line, i) => (
               <div key={i} className="overflow-hidden">
-                <motion.h2
-                  variants={lineVariants}
-                  className="text-4xl md:text-5xl lg:text-6xl font-display font-extrabold text-heading leading-tight"
+                <motion.h1
+                  initial={{ y: 120, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{
+                    duration: 1.2,
+                    delay: i * 0.15 + 0.2,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                  className={`font-heading font-black leading-[0.85] tracking-tighter ${
+                    i < 3
+                      ? "text-4xl md:text-5xl lg:text-6xl text-heading"
+                      : "text-3xl md:text-4xl lg:text-5xl text-foreground/20 italic"
+                  }`}
                 >
                   {line}
-                </motion.h2>
+                </motion.h1>
               </div>
+            ))}
+          </div>
+
+          {/* Stats row — High Contrast Archival */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1 }}
+            className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-24 py-16 border-y border-foreground/[0.05]"
+          >
+            {statItems.map((stat, i) => (
+              <StatCard key={stat.label} {...stat} delay={i * 0.1} />
             ))}
           </motion.div>
 
-          {/* Decorative divider with draw-in effect */}
-          <motion.div
-            initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] as const }}
-            className="h-px bg-border origin-left mb-12"
-          />
-
-          {/* Two-column info with staggered reveal */}
-          <div className="grid md:grid-cols-2 gap-12">
-            <motion.div
-              {...sectionReveal}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.7, delay: 0.1 }}
-            >
+          {/* Two-column mission/promise */}
+          <div className="grid md:grid-cols-2 gap-16 lg:gap-32 mb-24">
+            {[
+              {
+                title: "Artisan Mission",
+                text: "At Pozhi, we believe every pixel represents a legacy that deserves preservation. From biometric identification to heirloom wall frames, we deploy studio-grade craftsmanship to every asset we touch.",
+                delay: 0.1,
+              },
+              {
+                title: "Studio Integrity",
+                text: "We synthesize cutting-edge optical technology with archival processing. Whether you walk into our atelier or book our mobile elite units, you receive nothing less than absolute fidelity — delivered with zero latency.",
+                delay: 0.22,
+              },
+            ].map((col) => (
               <motion.div
-                initial={{ width: 0 }}
-                whileInView={{ width: "3rem" }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-                className="h-1 bg-primary rounded-full mb-6"
-              />
-              <h3 className="text-xl font-display font-bold text-heading mb-4">
-                Our Mission
-              </h3>
-              <motion.p
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                className="text-muted-foreground leading-relaxed"
+                key={col.title}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 1, delay: col.delay, ease: [0.22, 1, 0.36, 1] }}
               >
-                At Pozhi, we believe every moment deserves to be preserved with
-                the highest quality. From passport photos to premium wall frames,
-                we bring studio-grade craftsmanship to every print, every frame,
-                every album we create.
-              </motion.p>
-            </motion.div>
-
-            <motion.div
-              {...sectionReveal}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.7, delay: 0.25 }}
-            >
-              <motion.div
-                initial={{ width: 0 }}
-                whileInView={{ width: "3rem" }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.45 }}
-                className="h-1 bg-primary rounded-full mb-6"
-              />
-              <h3 className="text-xl font-display font-bold text-heading mb-4">
-                Our Promise
-              </h3>
-              <motion.p
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.55 }}
-                className="text-muted-foreground leading-relaxed"
-              >
-                We combine cutting-edge printing technology with artisanal
-                attention to detail. Whether you visit our studio or book our
-                mobile photographer, you'll receive nothing less than perfection
-                — delivered on time, every time.
-              </motion.p>
-            </motion.div>
+                {/* Accent rule */}
+                <motion.div
+                  initial={{ width: 0 }}
+                  whileInView={{ width: "3rem" }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 1, delay: col.delay + 0.3 }}
+                  className="h-px bg-foreground/20 mb-8 shadow-sm"
+                />
+                <h2 className="text-2xl font-heading font-black text-heading mb-6 tracking-tight uppercase">
+                  {col.title}
+                </h2>
+                <p className="text-muted-foreground/60 leading-relaxed text-sm font-body font-bold uppercase tracking-widest opacity-80 decoration-orange-200 decoration-1 underline-offset-4">
+                  {col.text}
+                </p>
+              </motion.div>
+            ))}
           </div>
+
+          {/* Full-width quote — Premium Gallery Visual */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+            className="relative p-12 md:p-24 rounded-[40px] bg-card border border-foreground/[0.03] overflow-hidden group shadow-2xl shadow-black/[0.02]"
+          >
+             {/* Subtle paper texture */}
+            <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-multiply" 
+                style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")` }} />
+
+            <div className="absolute inset-0 bg-gradient-to-tr from-foreground/[0.015] to-transparent pointer-events-none" />
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-foreground/5 to-transparent shadow-sm" />
+            <blockquote className="relative">
+              <span className="text-7xl font-heading leading-none text-foreground/[0.03] absolute -top-8 -left-6 select-none italic font-black">
+                "
+              </span>
+              <p className="text-2xl md:text-4xl font-heading font-black text-heading leading-[0.95] tracking-tighter max-w-2xl">
+                Light is the <span className="text-foreground/20 italic">Ultimate Artist</span>. We are merely its secure instruments of capture.
+              </p>
+              <footer className="mt-12 text-[10px] text-muted-foreground/40 tracking-[0.6em] uppercase font-body font-black">
+                — THE POZHI PROTOCOL
+              </footer>
+            </blockquote>
+          </motion.div>
         </div>
       </motion.main>
     </>

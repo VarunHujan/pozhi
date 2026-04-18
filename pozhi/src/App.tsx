@@ -21,8 +21,9 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Future from "./pages/Future";
 import Account from "./pages/Account";
+import OrderDetails from "./pages/OrderDetails";
 import NotFound from "./pages/NotFound";
-import AdminLayout from "./pages/admin/AdminLayout";
+
 
 const queryClient = new QueryClient();
 
@@ -44,9 +45,9 @@ const AnimatedRoutes = () => {
         <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
         <Route path="/future" element={<PageTransition><Future /></PageTransition>} />
         <Route path="/account" element={<PageTransition><Account /></PageTransition>} />
+        <Route path="/orders/:orderId" element={<PageTransition><OrderDetails /></PageTransition>} />
 
-        {/* Admin Routes - The Layout handles sub-routes and protection */}
-        <Route path="/admin/*" element={<AdminLayout />} />
+
 
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />

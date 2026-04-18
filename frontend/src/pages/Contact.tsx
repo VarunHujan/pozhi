@@ -1,31 +1,35 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { Mail, Phone, MapPin, Copy, Check, Clock } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Mail, Phone, MapPin, Copy, Check, Clock, ArrowRight, ShieldCheck, Zap } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const containerVariants = {
   initial: {},
   animate: {
-    transition: { staggerChildren: 0.1, delayChildren: 0.15 },
+    transition: { staggerChildren: 0.1, delayChildren: 0.2 },
   },
 };
 
 const cardVariants = {
-  initial: { opacity: 0, y: 30, scale: 0.96 },
+  initial: { opacity: 0, y: 30, filter: "blur(10px)" },
   animate: {
     opacity: 1,
     y: 0,
-    scale: 1,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const },
+    filter: "blur(0px)",
+    transition: { duration: 1, ease: [0.22, 1, 0.36, 1] as const },
   },
 };
 
 const Contact = () => {
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedPhone, setCopiedPhone] = useState(false);
+  const navigate = useNavigate();
 
   const copyToClipboard = (text: string, type: "email" | "phone") => {
     navigator.clipboard.writeText(text);
+    toast.success(`${type === "email" ? "Electronic mail route" : "Comm link"} copied to archive.`);
     if (type === "email") {
       setCopiedEmail(true);
       setTimeout(() => setCopiedEmail(false), 2000);
@@ -35,197 +39,238 @@ const Contact = () => {
     }
   };
 
+  const contactItems = [
+    {
+      icon: Mail,
+      label: "Electronic Mail Route",
+      value: "hello@pozhi.studio",
+      action: () => copyToClipboard("hello@pozhi.studio", "email"),
+      copied: copiedEmail,
+      type: "email" as const,
+      href: "mailto:hello@pozhi.studio",
+    },
+    {
+      icon: Phone,
+      label: "Secure Communication Link",
+      value: "+91 98765 43210",
+      action: () => copyToClipboard("+91 98765 43210", "phone"),
+      copied: copiedPhone,
+      type: "phone" as const,
+      href: "tel:+919876543210",
+    },
+  ];
+
   return (
     <>
       <Navbar visible={true} />
 
+      {/* Ambient warm lighting */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden bg-background">
+        <div className="absolute top-[20%] right-[-10%] w-[700px] h-[700px] bg-orange-50/20 rounded-full blur-[140px]" />
+        <div className="absolute bottom-[10%] left-[-15%] w-[600px] h-[600px] bg-blue-50/10 rounded-full blur-[160px]" />
+      </div>
+
       <motion.main
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="pt-28 pb-32 px-6 md:px-12"
+        transition={{ duration: 1 }}
+        className="relative z-10 pt-32 pb-40 px-6 md:px-12"
       >
         <div className="max-w-5xl mx-auto">
+          {/* Header Section — Editorial Manifest */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] as const }}
+            transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] as const }}
+            className="mb-24"
           >
-            <p className="text-sm font-medium text-primary tracking-[0.3em] uppercase mb-4">
-              Get in Touch
+            <p className="text-[10px] font-body font-black text-muted-foreground/60 tracking-[0.5em] uppercase mb-8">
+              ESTABLISH CONNECTION
             </p>
-            <h1 className="text-4xl md:text-5xl font-display font-extrabold text-heading leading-tight mb-4">
-              Contact Us
+            <h1 className="text-4xl md:text-6xl font-heading font-black text-heading leading-[0.85] tracking-tighter mb-8">
+              Handshake <br /> <span className="text-foreground/10 italic">Inbound.</span>
             </h1>
             <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: "4rem" }}
-              transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] as const }}
-              className="h-1 bg-primary rounded-full mb-12"
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ duration: 1.5, delay: 0.5, ease: [0.22, 1, 0.36, 1] as const }}
+              className="h-px bg-foreground/[0.05] origin-left mt-12 shadow-sm"
             />
           </motion.div>
 
+          {/* Main grid — BENTO High Contrast */}
           <motion.div
             variants={containerVariants}
             initial="initial"
             animate="animate"
-            className="flex flex-col lg:flex-row gap-8"
+            className="grid lg:grid-cols-2 gap-8 items-start"
           >
-            {/* Left — Contact info */}
-            <motion.div
-              variants={cardVariants}
-              className="lg:w-1/2 space-y-4"
-            >
-              {/* Email */}
-              <motion.button
-                whileHover={{ scale: 1.02, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() =>
-                  copyToClipboard("hello@pozhi.studio", "email")
-                }
-                className="w-full group text-left p-6 rounded-2xl border border-border bg-card hover:border-primary/30 hover:shadow-[0_8px_30px_-8px_hsla(220,100%,40%,0.12)] transition-all duration-300"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-4">
-                    <motion.div
-                      whileHover={{ rotate: [0, -10, 10, 0] }}
-                      transition={{ duration: 0.4 }}
-                      className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center"
-                    >
-                      <Mail className="w-5 h-5 text-primary" />
-                    </motion.div>
-                    <div>
-                      <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
-                        Email
-                      </p>
-                      <p className="text-lg font-display font-bold text-heading">
-                        hello@pozhi.studio
-                      </p>
+            {/* Left — Contact cards */}
+            <div className="flex flex-col gap-6">
+              {contactItems.map((item) => (
+                <motion.button
+                  key={item.label}
+                  variants={cardVariants}
+                  whileHover={{ y: -5, backgroundColor: "rgba(0,0,0,0.01)" }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={item.action}
+                  className="w-full group text-left p-10 rounded-[40px] border border-foreground/[0.03] bg-card hover:border-foreground/10 transition-all duration-700 cursor-pointer relative overflow-hidden shadow-2xl shadow-black/[0.01]"
+                >
+                    {/* Paper texture */}
+                    <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-multiply" 
+                        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")` }} />
+
+                  <div className="flex items-start justify-between relative z-10">
+                    <div className="flex items-center gap-6">
+                      <div className="w-14 h-14 rounded-2xl bg-foreground/[0.03] border border-foreground/5 flex items-center justify-center transition-all duration-500 group-hover:bg-foreground group-hover:text-background">
+                        <item.icon className="w-5 h-5 text-foreground/40 transition-colors duration-500 group-hover:text-background" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-muted-foreground/40 uppercase tracking-[0.4em] mb-2 font-body font-black">
+                          {item.label}
+                        </p>
+                        <p className="text-xl md:text-2xl font-heading font-black text-heading tracking-tight">
+                          {item.value}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-2 flex-shrink-0">
+                      <AnimatePresence mode="wait">
+                        {item.copied ? (
+                            <motion.div
+                            key="check"
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0, opacity: 0 }}
+                            transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                            >
+                            <Check className="w-5 h-5 text-foreground/40" />
+                            </motion.div>
+                        ) : (
+                            <motion.div key="copy" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                                <Copy className="w-5 h-5 text-foreground/10 group-hover:text-foreground/40 transition-all duration-300" />
+                            </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
                   </div>
-                  <div className="mt-3">
-                    {copiedEmail ? (
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ type: "spring", stiffness: 400, damping: 15 }}
-                      >
-                        <Check className="w-4 h-4 text-primary" />
-                      </motion.div>
-                    ) : (
-                      <Copy className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                    )}
-                  </div>
-                </div>
-              </motion.button>
+                </motion.button>
+              ))}
 
-              {/* Phone */}
-              <motion.button
-                whileHover={{ scale: 1.02, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() =>
-                  copyToClipboard("+91 98765 43210", "phone")
-                }
-                className="w-full group text-left p-6 rounded-2xl border border-border bg-card hover:border-primary/30 hover:shadow-[0_8px_30px_-8px_hsla(220,100%,40%,0.12)] transition-all duration-300"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-4">
-                    <motion.div
-                      whileHover={{ rotate: [0, -10, 10, 0] }}
-                      transition={{ duration: 0.4 }}
-                      className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center"
-                    >
-                      <Phone className="w-5 h-5 text-primary" />
-                    </motion.div>
-                    <div>
-                      <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
-                        Phone
-                      </p>
-                      <p className="text-lg font-display font-bold text-heading">
-                        +91 98765 43210
-                      </p>
-                    </div>
-                  </div>
-                  <div className="mt-3">
-                    {copiedPhone ? (
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ type: "spring", stiffness: 400, damping: 15 }}
-                      >
-                        <Check className="w-4 h-4 text-primary" />
-                      </motion.div>
-                    ) : (
-                      <Copy className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                    )}
-                  </div>
-                </div>
-              </motion.button>
-            </motion.div>
-
-            {/* Right — Address */}
-            <motion.div
-              variants={cardVariants}
-              className="lg:w-1/2"
-            >
+              {/* Book session CTA — Premium Light Visual */}
               <motion.div
-                whileHover={{ y: -4 }}
-                transition={{ duration: 0.3 }}
-                className="h-full rounded-2xl border border-border bg-card p-8 flex flex-col justify-between hover:shadow-[0_12px_40px_-8px_hsla(220,100%,40%,0.1)] transition-shadow duration-300"
+                variants={cardVariants}
+                className="relative p-12 rounded-[50px] border border-foreground/[0.03] bg-foreground/[0.015] overflow-hidden group shadow-xl shadow-black/[0.01]"
               >
-                <div>
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                      <MapPin className="w-5 h-5 text-primary" />
+                <div className="absolute inset-0 bg-gradient-to-br from-foreground/[0.01] via-transparent to-transparent pointer-events-none" />
+                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-foreground/5 to-transparent shadow-sm" />
+                <div className="relative">
+                   <div className="flex items-center gap-3 mb-6 opacity-20">
+                      <Zap className="w-4 h-4 fill-current" />
+                      <span className="text-[10px] font-body font-black text-foreground uppercase tracking-[0.5em]">Protocol Trigger</span>
+                   </div>
+                  <p className="text-2xl font-heading font-black text-heading tracking-tighter mb-4 uppercase">
+                    Ready to archive?
+                  </p>
+                  <p className="text-sm text-muted-foreground/60 leading-relaxed font-body font-bold uppercase tracking-widest mb-10 opacity-60">
+                    Walk into our atelier or establish a relay to book your next session. We specialize in framing your legacy.
+                  </p>
+                  <button
+                    onClick={() => navigate("/studio")}
+                    className="cursor-pointer flex items-center gap-4 text-[10px] font-heading font-black text-foreground tracking-[0.4em] uppercase hover:gap-6 transition-all duration-500 group/btn"
+                  >
+                    DEPLOY SERVICES
+                    <ArrowRight className="w-4 h-4 transition-transform duration-500 group-hover/btn:translate-x-2" />
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Right — Location + Hours Hub */}
+            <motion.div variants={cardVariants}>
+              <div className="h-full rounded-[60px] border border-foreground/[0.03] bg-card overflow-hidden relative shadow-2xl shadow-black/[0.02]">
+                 {/* Subtle paper texture */}
+                 <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-multiply" 
+                    style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")` }} />
+
+                <div className="absolute inset-0 bg-gradient-to-br from-foreground/[0.01] to-transparent pointer-events-none" />
+                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-foreground/5 to-transparent shadow-sm" />
+
+                <div className="relative p-12 lg:p-16 flex flex-col h-full gap-12">
+                  {/* Location header */}
+                  <div className="flex items-center gap-6">
+                    <div className="w-14 h-14 rounded-2xl bg-foreground/[0.03] border border-foreground/[0.05] flex items-center justify-center">
+                      <MapPin className="w-5 h-5 text-foreground/30" />
                     </div>
                     <div>
-                      <p className="text-xs text-muted-foreground uppercase tracking-wider">
-                        Studio Location
+                      <p className="text-[10px] text-muted-foreground/40 uppercase tracking-[0.4em] mb-2 font-body font-black">
+                        Studio Coordinates
                       </p>
-                      <p className="text-lg font-display font-bold text-heading">
-                        Visit Us
+                      <p className="text-2xl font-heading font-black text-heading uppercase tracking-tighter">
+                        Visit The Atelier
                       </p>
                     </div>
                   </div>
 
-                  <motion.div
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.4, duration: 0.5 }}
-                  >
-                    <p className="text-muted-foreground leading-relaxed mb-2 font-medium">
+                  {/* Address */}
+                  <div>
+                    <p className="text-md font-body font-black text-foreground/80 mb-3 uppercase tracking-widest">
                       Pozhi Photography Studio
                     </p>
-                    <p className="text-muted-foreground leading-relaxed">
+                    <p className="text-sm text-muted-foreground leading-relaxed font-body font-bold uppercase tracking-[0.2em] opacity-40">
                       123 Creative Lane, Art District
                       <br />
                       Chennai, Tamil Nadu 600001
                       <br />
                       India
                     </p>
-                  </motion.div>
-                </div>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5, duration: 0.5 }}
-                  className="mt-8 pt-6 border-t border-border"
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <Clock className="w-3.5 h-3.5 text-primary" />
-                    <p className="text-xs text-muted-foreground uppercase tracking-wider">
-                      Studio Hours
-                    </p>
                   </div>
-                  <p className="text-sm text-foreground font-medium">
-                    Mon – Sat: 9:00 AM – 8:00 PM
-                  </p>
-                  <p className="text-sm text-foreground font-medium">
-                    Sunday: 10:00 AM – 5:00 PM
-                  </p>
-                </motion.div>
-              </motion.div>
+
+                  {/* Map Archive Visual — High End Gallery Effect */}
+                  <div className="flex-1 rounded-[40px] bg-foreground/[0.02] border border-foreground/[0.05] flex items-center justify-center min-h-[160px] overflow-hidden relative shadow-inner">
+                    <div
+                      className="absolute inset-0"
+                      style={{
+                        background:
+                          "radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0.01) 0%, transparent 70%)",
+                      }}
+                    />
+                    <div className="text-center relative z-10">
+                      <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center border border-foreground/5 shadow-xl mx-auto mb-6 transform hover:scale-110 transition-transform duration-700">
+                         <MapPin className="w-6 h-6 text-foreground/20" />
+                      </div>
+                      <p className="text-[10px] text-foreground/20 tracking-[0.6em] uppercase font-body font-black">
+                        CHENNAI // ARCHIVE.001
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Studio Ledger Hours */}
+                  <div className="pt-12 border-t border-foreground/[0.05]">
+                    <div className="flex items-center gap-4 mb-8">
+                       <span className="text-[11px] font-heading font-black text-heading">OPENING PROTOCOLS</span>
+                       <div className="w-12 h-px bg-foreground/10" />
+                    </div>
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center group/day">
+                        <span className="text-[10px] text-muted-foreground/40 font-body font-black uppercase tracking-[0.4em] group-hover/day:text-foreground/80 transition-colors">Mon – Sat</span>
+                        <div className="h-px flex-1 mx-4 bg-foreground/[0.05] shadow-sm" />
+                        <span className="text-xs font-heading font-black text-heading tracking-widest uppercase">09:00 — 20:00</span>
+                      </div>
+                      <div className="flex justify-between items-center group/day">
+                        <span className="text-[10px] text-muted-foreground/40 font-body font-black uppercase tracking-[0.4em] group-hover/day:text-foreground/80 transition-colors">Sunday</span>
+                        <div className="h-px flex-1 mx-4 bg-foreground/[0.05] shadow-sm" />
+                        <span className="text-xs font-heading font-black text-heading tracking-widest uppercase italic">10:00 — 17:00</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 flex items-center gap-3 opacity-20">
+                     <ShieldCheck className="w-4 h-4" />
+                     <p className="text-[9px] font-body font-black text-foreground uppercase tracking-[0.4em]">Handshake Protocol Verified</p>
+                  </div>
+                </div>
+              </div>
             </motion.div>
           </motion.div>
         </div>

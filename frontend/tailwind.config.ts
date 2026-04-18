@@ -14,8 +14,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["Inter", "sans-serif"],
-        display: ["Manrope", "sans-serif"],
+        sans: ["Space Grotesk", "sans-serif"],
+        display: ["Archivo", "sans-serif"],
+        body: ["Space Grotesk", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -24,8 +25,11 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         surface: "hsl(var(--surface))",
+        "surface-2": "hsl(var(--surface-2))",
         heading: "hsl(var(--heading))",
         body: "hsl(var(--body))",
+        gold: "hsl(var(--gold))",
+        silver: "hsl(var(--silver))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
@@ -79,10 +83,38 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        float: {
+          "0%, 100%": { transform: "translateY(0px)" },
+          "50%": { transform: "translateY(-12px)" },
+        },
+        "shimmer-sweep": {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(200%)" },
+        },
+        "pulse-glow": {
+          "0%, 100%": { opacity: "0.4", transform: "scale(1)" },
+          "50%": { opacity: "0.7", transform: "scale(1.05)" },
+        },
+        "grain-anim": {
+          "0%, 100%": { transform: "translate(0,0)" },
+          "10%": { transform: "translate(-2%,-3%)" },
+          "30%": { transform: "translate(-1%,2%)" },
+          "50%": { transform: "translate(-2%,3%)" },
+          "70%": { transform: "translate(-3%,1%)" },
+          "90%": { transform: "translate(-1%,-2%)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        float: "float 6s ease-in-out infinite",
+        "shimmer-sweep": "shimmer-sweep 0.6s ease forwards",
+        "pulse-glow": "pulse-glow 3s ease-in-out infinite",
+        "grain-anim": "grain-anim 8s steps(1) infinite",
+      },
+      letterSpacing: {
+        "ultra-wide": "0.3em",
+        "mega-wide": "0.5em",
       },
     },
   },

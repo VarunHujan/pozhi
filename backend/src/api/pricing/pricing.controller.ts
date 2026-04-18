@@ -25,8 +25,13 @@ export const getPassPhotoPricing = async (
             .order('display_order');
 
         if (catError) {
-            logger.error('Failed to fetch passphoto categories', { error: catError.message });
-            throw new ApiError(500, 'Failed to fetch pricing data');
+            console.error('SUPABASE ERROR (Categories):', catError);
+            logger.error('Failed to fetch passphoto categories', { 
+                error: catError.message,
+                code: catError.code,
+                details: catError.details
+            });
+            throw new ApiError(500, `Failed to fetch categories: ${catError.message}`);
         }
 
         // Fetch all packs and group by category
@@ -37,8 +42,13 @@ export const getPassPhotoPricing = async (
             .order('display_order');
 
         if (packsError) {
-            logger.error('Failed to fetch passphoto packs', { error: packsError.message });
-            throw new ApiError(500, 'Failed to fetch pricing data');
+            console.error('SUPABASE ERROR (Packs):', packsError);
+            logger.error('Failed to fetch passphoto packs', { 
+                error: packsError.message,
+                code: packsError.code,
+                details: packsError.details
+            });
+            throw new ApiError(500, `Failed to fetch packs: ${packsError.message}`);
         }
 
         // Group packs by category
@@ -51,7 +61,8 @@ export const getPassPhotoPricing = async (
             packs: packs
                 ?.filter(pack => pack.category_id === category.id)
                 .map(pack => ({
-                    id: pack.pack_id,
+                    id: pack.id, // Use UUID
+                    packId: pack.pack_id, // Keep text ID just in case
                     label: pack.label,
                     copies: pack.copies,
                     price: parseFloat(pack.price),
@@ -109,7 +120,8 @@ export const getPhotoCopiesPricing = async (
             status: 'success',
             data: {
                 single: singleOptions?.map(opt => ({
-                    id: opt.option_id,
+                    id: opt.id, // Use UUID
+                    optionId: opt.option_id,
                     sizeLabel: opt.size_label,
                     sizeKey: opt.size_key,
                     copies: opt.copies_text,
@@ -117,7 +129,8 @@ export const getPhotoCopiesPricing = async (
                     aspectRatio: opt.aspect_ratio
                 })) || [],
                 set: setOptions?.map(opt => ({
-                    id: opt.set_id,
+                    id: opt.id, // Use UUID
+                    setId: opt.set_id,
                     sizeLabel: opt.size_label,
                     sizeKey: opt.size_key,
                     pricePerPiece: parseFloat(opt.price_per_piece),
@@ -170,12 +183,14 @@ export const getFramesPricing = async (
             status: 'success',
             data: {
                 materials: materials?.map(mat => ({
-                    id: mat.material_id,
+                    id: mat.id, // Use UUID
+                    materialId: mat.material_id,
                     label: mat.label,
                     description: mat.description
                 })) || [],
                 sizes: sizes?.map(size => ({
-                    id: size.size_id,
+                    id: size.id, // Use UUID
+                    sizeId: size.size_id,
                     sizeLabel: size.size_label,
                     dimensions: size.dimensions,
                     price: parseFloat(size.price),
@@ -215,7 +230,8 @@ export const getAlbumPricing = async (
             status: 'success',
             data: {
                 capacities: capacities?.map(cap => ({
-                    id: cap.capacity_id,
+                    id: cap.id, // Use UUID
+                    capacityId: cap.capacity_id,
                     label: cap.label,
                     images: cap.images,
                     price: parseFloat(cap.price)
@@ -270,7 +286,8 @@ export const getSnapnPrintPricing = async (
             packages: packages
                 ?.filter(pkg => pkg.category_id === category.id)
                 .map(pkg => ({
-                    id: pkg.package_id,
+                    id: pkg.id, // Use UUID
+                    packageId: pkg.package_id,
                     label: pkg.label,
                     price: parseFloat(pkg.price)
                 })) || []
@@ -347,7 +364,8 @@ async function getPassPhotoPricingData() {
         packs: packs
             ?.filter(pack => pack.category_id === category.id)
             .map(pack => ({
-                id: pack.pack_id,
+                id: pack.id, // Use UUID
+                packId: pack.pack_id,
                 label: pack.label,
                 copies: pack.copies,
                 price: parseFloat(pack.price),
@@ -371,7 +389,8 @@ async function getPhotoCopiesPricingData() {
 
     return {
         single: singleOptions?.map(opt => ({
-            id: opt.option_id,
+            id: opt.id, // Use UUID
+            optionId: opt.option_id,
             sizeLabel: opt.size_label,
             sizeKey: opt.size_key,
             copies: opt.copies_text,
@@ -379,7 +398,8 @@ async function getPhotoCopiesPricingData() {
             aspectRatio: opt.aspect_ratio
         })) || [],
         set: setOptions?.map(opt => ({
-            id: opt.set_id,
+            id: opt.id, // Use UUID
+            setId: opt.set_id,
             sizeLabel: opt.size_label,
             sizeKey: opt.size_key,
             pricePerPiece: parseFloat(opt.price_per_piece),
@@ -404,12 +424,14 @@ async function getFramesPricingData() {
 
     return {
         materials: materials?.map(mat => ({
-            id: mat.material_id,
+            id: mat.id, // Use UUID
+            materialId: mat.material_id,
             label: mat.label,
             description: mat.description
         })) || [],
         sizes: sizes?.map(size => ({
-            id: size.size_id,
+            id: size.id, // Use UUID
+            sizeId: size.size_id,
             sizeLabel: size.size_label,
             dimensions: size.dimensions,
             price: parseFloat(size.price),
@@ -427,7 +449,8 @@ async function getAlbumPricingData() {
         .order('display_order');
 
     return capacities?.map(cap => ({
-        id: cap.capacity_id,
+        id: cap.id, // Use UUID
+        capacityId: cap.capacity_id,
         label: cap.label,
         images: cap.images,
         price: parseFloat(cap.price)
@@ -454,9 +477,66 @@ async function getSnapnPrintPricingData() {
         packages: packages
             ?.filter(pkg => pkg.category_id === category.id)
             .map(pkg => ({
-                id: pkg.package_id,
+                id: pkg.id, // Use UUID
+                packageId: pkg.package_id,
                 label: pkg.label,
                 price: parseFloat(pkg.price)
             })) || []
     })) || [];
 }
+
+// ==========================================
+// UPDATE PRICING (Admin Only)
+// ==========================================
+
+export const updatePrice = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+        // Check admin role
+        if (req.user?.role !== 'admin') {
+            throw new ApiError(403, 'Admin access required');
+        }
+
+        const { type, id, price } = req.body;
+
+        // Allowlist of tables is handled by Zod validation, but double check here for safety
+        const validTables = [
+            'passphoto_packs',
+            'photocopies_single',
+            'photocopies_set',
+            'frame_sizes',
+            'album_capacities',
+            'snapnprint_packages'
+        ];
+
+        if (!validTables.includes(type)) {
+            throw new ApiError(400, 'Invalid product type');
+        }
+
+        const { data, error } = await supabase
+            .from(type)
+            .update({ price: price, updated_at: new Date().toISOString() })
+            .eq('id', id)
+            .select()
+            .single();
+
+        if (error) {
+            logger.error('Failed to update price', { error: error.message, type, id });
+            throw new ApiError(500, 'Failed to update price');
+        }
+
+        logger.info('Price updated successfully', { type, id, price });
+
+        res.status(200).json({
+            status: 'success',
+            message: 'Price updated successfully',
+            data
+        });
+
+    } catch (error) {
+        next(error);
+    }
+};

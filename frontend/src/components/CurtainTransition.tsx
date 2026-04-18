@@ -10,43 +10,43 @@ const CurtainTransition = ({ isActive, onComplete }: CurtainTransitionProps) => 
 
   return (
     <div className="fixed inset-0 z-[200] pointer-events-none">
-      {/* Left curtain */}
+      {/* Top panel */}
       <motion.div
-        className="absolute top-0 left-0 w-1/2 h-full bg-primary"
-        initial={{ scaleX: 0 }}
-        animate={{ scaleX: [0, 1, 1, 0] }}
+        className="absolute top-0 left-0 right-0 h-1/2 bg-background"
+        initial={{ scaleY: 0 }}
+        animate={{ scaleY: [0, 1, 1, 0] }}
         transition={{
           duration: 1.4,
-          times: [0, 0.4, 0.6, 1],
+          times: [0, 0.38, 0.62, 1],
           ease: [0.76, 0, 0.24, 1],
         }}
-        style={{ transformOrigin: "left" }}
+        style={{ transformOrigin: "top" }}
         onAnimationComplete={onComplete}
       />
-      {/* Right curtain */}
+      {/* Bottom panel */}
       <motion.div
-        className="absolute top-0 right-0 w-1/2 h-full bg-primary"
-        initial={{ scaleX: 0 }}
-        animate={{ scaleX: [0, 1, 1, 0] }}
+        className="absolute bottom-0 left-0 right-0 h-1/2 bg-background"
+        initial={{ scaleY: 0 }}
+        animate={{ scaleY: [0, 1, 1, 0] }}
         transition={{
           duration: 1.4,
-          times: [0, 0.4, 0.6, 1],
+          times: [0, 0.38, 0.62, 1],
           ease: [0.76, 0, 0.24, 1],
         }}
-        style={{ transformOrigin: "right" }}
+        style={{ transformOrigin: "bottom" }}
       />
-      
-      {/* Center text flash */}
+
+      {/* Center brand flash */}
       <motion.div
         className="absolute inset-0 flex items-center justify-center"
         initial={{ opacity: 0 }}
         animate={{ opacity: [0, 1, 1, 0] }}
         transition={{
           duration: 1.4,
-          times: [0, 0.35, 0.65, 1],
+          times: [0, 0.32, 0.68, 1],
         }}
       >
-        <span className="text-primary-foreground text-2xl md:text-4xl font-display font-extrabold tracking-[0.3em] uppercase">
+        <span className="text-foreground/90 text-xl md:text-3xl font-heading font-black tracking-[0.61em] uppercase">
           POZHI
         </span>
       </motion.div>

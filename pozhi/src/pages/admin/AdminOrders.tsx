@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageCircle, Check, ChevronDown, Truck, User, X } from "lucide-react";
+import { MessageCircle, Check, ChevronDown, Truck, User, X, Loader2 } from "lucide-react";
+import { fetchAllOrders, updateOrderStatus, Order as ApiOrder } from "@/services/api";
 
-interface Order {
+// Internal UI Order interface
+interface AdminUiOrder {
   id: string;
   service: string;
   detail: string;
@@ -10,13 +12,9 @@ interface Order {
   customer: string;
   phone: string;
   status: "pending" | "done";
+  originalId: string; // Backend UUID
+  images: string[];
 }
-
-const mockOrders: Order[] = [
-  { id: "ORD-001", service: "Passport Photo", detail: "32 Copies", price: 349, customer: "Ravi Kumar", phone: "919876543210", status: "pending" },
-  { id: "ORD-002", service: "Photo Frame", detail: "8×12 Wooden", price: 450, customer: "Priya S", phone: "919876543211", status: "pending" },
-  { id: "ORD-003", service: "Album", detail: "40 Pages - Hard Cover", price: 899, customer: "Suresh M", phone: "919876543212", status: "pending" },
-];
 
 const deliveryPartners = [
   { name: "Muthu", phone: "919800000001" },
@@ -25,11 +23,53 @@ const deliveryPartners = [
 ];
 
 const AdminOrders = () => {
-  const [orders, setOrders] = useState<Order[]>(mockOrders);
+  const [orders, setOrders] = useState<AdminUiOrder[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<string | null>(null);
-  const [deliveryModal, setDeliveryModal] = useState<Order | null>(null);
+  const [deliveryModal, setDeliveryModal] = useState<AdminUiOrder | null>(null);
 
-  const markDone = (id: string) => {
+  useEffect(() => {
+    loadOrders();
+  }, []);
+
+  const loadOrders = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await fetchAllOrders();
+      console.log("Admin Orders Data:", data);
+
+      // Map backend data to UI format
+      const mappedOrders: AdminUiOrder[] = data.map(o => {
+        const isDone = ['delivered', 'cancelled', 'completed'].includes(o.order_status?.toLowerCase() || '');
+        return {
+          id: o.order_number, // Use friendly ID for display
+          originalId: o.id,
+          service: o.service_type || "Order",
+          // Create a summary of items for "detail"
+          detail: o.order_items && o.order_items.length > 0
+            ? `${o.order_items.length} items`
+            : new Date(o.created_at).toLocaleDateString(),
+          price: o.total_amount,
+          // Fallback if customer info specific fields aren't in the simplified Type yet
+          customer: (o as any).customer_name || "Customer",
+          phone: (o as any).customer_phone || "",
+          status: isDone ? "done" : "pending",
+          images: o.order_items?.map(i => i.user_uploads?.storage_url).filter((url): url is string => !!url) || []
+        };
+      });
+
+      setOrders(mappedOrders);
+    } catch (err: any) {
+      console.error("Failed to load admin orders", err);
+      setError(err.message || "Failed to load orders");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const markDone = async (id: string) => {
     // Play ding
     try {
       const ctx = new AudioContext();
@@ -38,17 +78,33 @@ const AdminOrders = () => {
       osc.connect(gain); gain.connect(ctx.destination);
       osc.frequency.value = 880; gain.gain.value = 0.15;
       osc.start(); osc.stop(ctx.currentTime + 0.12);
-    } catch {}
+    } catch { }
+
+    // Optimistic update
     setOrders((prev) => prev.map((o) => o.id === id ? { ...o, status: "done" } : o));
     setExpanded(null);
+
+    try {
+      // Find the original backend ID (UUID) from the UI order object
+      const order = orders.find(o => o.id === id);
+      if (order && order.originalId) {
+        await updateOrderStatus(order.originalId, 'delivered');
+      }
+    } catch (err) {
+      console.error("Failed to update status in backend", err);
+      // Revert optimistic update on failure
+      setOrders((prev) => prev.map((o) => o.id === id ? { ...o, status: "pending" } : o));
+      alert("Failed to update order status. Please try again.");
+    }
   };
 
   const openWhatsApp = (phone: string, orderId: string) => {
+    if (!phone) return alert("No phone number available");
     const msg = encodeURIComponent(`Hello! Your order #${orderId} is Ready for Pickup at Pozhi Studio. 📸`);
     window.open(`https://wa.me/${phone}?text=${msg}`, "_blank");
   };
 
-  const assignDelivery = (partner: typeof deliveryPartners[0], order: Order) => {
+  const assignDelivery = (partner: typeof deliveryPartners[0], order: AdminUiOrder) => {
     const msg = encodeURIComponent(
       `🚚 Delivery Request\n\nCustomer: ${order.customer}\nPhone: ${order.phone}\nOrder: ${order.service} - ${order.detail}\n\nPlease pick up from Pozhi Studio.`
     );
@@ -58,6 +114,32 @@ const AdminOrders = () => {
 
   const pending = orders.filter((o) => o.status === "pending");
   const done = orders.filter((o) => o.status === "done");
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <Loader2 className="w-8 h-8 animate-spin text-gray-300" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[50vh] p-4 text-center">
+        <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mb-4">
+          <X className="w-6 h-6 text-red-500" />
+        </div>
+        <h3 className="text-lg font-bold text-gray-900">Failed to load orders</h3>
+        <p className="text-gray-500 mb-4">{error}</p>
+        <button
+          onClick={loadOrders}
+          className="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-semibold hover:bg-gray-800"
+        >
+          Try Again
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="p-5 md:p-8 max-w-2xl mx-auto">
@@ -107,6 +189,23 @@ const AdminOrders = () => {
                     transition={{ duration: 0.2 }}
                     className="overflow-hidden"
                   >
+                    {/* Image Previews */}
+                    {order.images && order.images.length > 0 && (
+                      <div className="px-4 pb-4 flex gap-2 overflow-x-auto">
+                        {order.images.map((img, idx) => (
+                          <a
+                            key={idx}
+                            href={img}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block w-24 h-24 rounded-xl overflow-hidden border border-gray-100 flex-shrink-0 bg-gray-50"
+                          >
+                            <img src={img} alt="Order asset" className="w-full h-full object-cover" />
+                          </a>
+                        ))}
+                      </div>
+                    )}
+
                     <div className="px-4 pb-4 flex gap-2">
                       <motion.button
                         whileTap={{ scale: 0.96 }}

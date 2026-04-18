@@ -1,462 +1,331 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { CheckCircle, Lock, QrCode, Calendar, Gift } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  ArrowLeft,
+  CreditCard,
+  ShieldCheck,
+  Zap,
+  Lock,
+  ChevronRight,
+  Terminal,
+} from "lucide-react";
 import Navbar from "@/components/Navbar";
 import ProcessingOverlay from "@/components/checkout/ProcessingOverlay";
 import SuccessScreen from "@/components/checkout/SuccessScreen";
 import FailureScreen from "@/components/checkout/FailureScreen";
-import type { CheckoutState } from "@/lib/checkout-types";
 
-const GIFT_WRAP_PRICE = 30;
-
-type PaymentStatus = "idle" | "processing" | "success" | "error";
-
-const pageVariants = {
-  initial: { opacity: 0, y: 40, scale: 0.98 },
-  animate: { opacity: 1, y: 0, scale: 1 },
-  exit: { opacity: 0, y: -20, scale: 0.98 },
-};
-
-const staggerContainer = {
-  animate: {
-    transition: { staggerChildren: 0.08, delayChildren: 0.1 },
-  },
-};
-
-const fadeSlideUp = {
-  initial: { opacity: 0, y: 24 },
-  animate: { opacity: 1, y: 0 },
-};
+interface CheckoutState {
+  service: string;
+  title: string;
+  details: { label: string; value: string }[];
+  price: number;
+  isBooking?: boolean;
+  image?: string | { front: string | null; back: string | null } | null;
+}
 
 const Checkout = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const orderState = location.state as CheckoutState | null;
+  const state = location.state as CheckoutState;
 
-  const [name, setName] = useState("");
-  const [mobile, setMobile] = useState("");
-  const [address, setAddress] = useState("");
-  const [eventDate, setEventDate] = useState("");
-  const [isGiftWrapped, setIsGiftWrapped] = useState(false);
-  const [status, setStatus] = useState<PaymentStatus>("idle");
+  const [status, setStatus] = useState<"idle" | "processing" | "success" | "failure">("idle");
+  const [formData, setFormData] = useState({
+    name: "",
+    mobile: "",
+    email: "",
+    address: "",
+  });
 
+  // Redirect if no state
   useEffect(() => {
-    if (!orderState) navigate("/", { replace: true });
-  }, [orderState, navigate]);
+    if (!state) {
+      navigate("/");
+    }
+  }, [state, navigate]);
 
-  const finalTotal = useMemo(() => {
-    if (!orderState) return 0;
-    return orderState.price + (isGiftWrapped ? GIFT_WRAP_PRICE : 0);
-  }, [orderState, isGiftWrapped]);
-
-  const handlePlaceOrder = useCallback(() => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     setStatus("processing");
-    const isErrorTest = name.trim().toLowerCase() === "error";
 
+    // Simulate payment processing
     setTimeout(() => {
-      setStatus(isErrorTest ? "error" : "success");
-    }, 2500);
-  }, [name]);
+      // 95% success rate for demo
+      if (Math.random() > 0.05) {
+        setStatus("success");
+      } else {
+        setStatus("failure");
+      }
+    }, 4500);
+  };
 
-  const handleRetry = useCallback(() => {
-    setStatus("idle");
-  }, []);
-
-  if (!orderState) return null;
-
-  const isFormValid = name.trim().length > 0 && mobile.trim().length >= 10;
+  if (!state) return null;
 
   return (
     <>
-      <Navbar visible={true} />
+      <Navbar visible={status === "idle"} />
 
-      <motion.main
-        variants={pageVariants}
-        initial="initial"
-        animate="animate"
-        exit="exit"
-        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        className="pt-24 pb-32 px-4 md:px-8 lg:px-12"
-      >
-        <div className="max-w-5xl mx-auto">
-          {/* Header */}
-          <motion.div
-            variants={fadeSlideUp}
-            initial="initial"
-            animate="animate"
-            className="mb-10"
-          >
-            <p className="text-sm font-medium text-primary tracking-[0.3em] uppercase mb-2">
-              Checkout
-            </p>
-            <h1 className="text-3xl md:text-4xl font-display font-extrabold text-heading leading-tight">
-              Verify & Pay
-            </h1>
-          </motion.div>
+      <main className="min-h-screen pt-24 pb-24 md:pt-40 md:pb-40 px-6 md:px-12 relative overflow-hidden">
+        {/* Ambient warm lighting — Light Luxe Atmosphere */}
+        {/* Redundant background removed — handled by ThemeLayout */}
 
-          {/* State switcher */}
+        <div className="max-w-7xl mx-auto relative z-10">
           <AnimatePresence mode="wait">
-            {status === "processing" && (
-              <ProcessingOverlay key="processing" />
-            )}
-
-            {status === "success" && (
-              <SuccessScreen
-                key="success"
-                userName={name}
-                mobile={mobile}
-              />
-            )}
-
-            {status === "error" && (
-              <FailureScreen key="error" onRetry={handleRetry} />
-            )}
-
             {status === "idle" && (
               <motion.div
                 key="idle"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20, filter: "blur(15px)" }}
+                transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+                className="grid lg:grid-cols-[1fr_1.1fr] gap-16 lg:gap-32 items-start"
               >
-                <CheckoutForm
-                  orderState={orderState}
-                  name={name}
-                  setName={setName}
-                  mobile={mobile}
-                  setMobile={setMobile}
-                  address={address}
-                  setAddress={setAddress}
-                  eventDate={eventDate}
-                  setEventDate={setEventDate}
-                  isGiftWrapped={isGiftWrapped}
-                  setIsGiftWrapped={setIsGiftWrapped}
-                  finalTotal={finalTotal}
-                  isFormValid={isFormValid}
-                  onPlaceOrder={handlePlaceOrder}
-                />
+                {/* Left Side — Summary & Logic — Editorial Receipt */}
+                <div className="space-y-12 md:space-y-16">
+                  <button
+                    onClick={() => navigate(-1)}
+                    className="group flex items-center gap-3 text-[10px] text-muted-foreground/60 font-body font-bold tracking-[0.4em] uppercase hover:text-foreground transition-all cursor-pointer"
+                  >
+                    <ArrowLeft className="w-3 h-3 group-hover:-translate-x-2 transition-transform" />
+                    Re-calibrate Asset
+                  </button>
+
+                  <div className="space-y-10">
+                    <div>
+                        <div className="flex items-center gap-6 mb-6">
+                            <span className="text-[10px] font-heading font-black text-foreground/20 uppercase tracking-[0.5em] mb-0.5">Order // Manifest</span>
+                            <div className="h-px flex-1 bg-foreground/[0.05]" />
+                        </div>
+                        <h1 className="text-5xl md:text-8xl font-heading font-black text-heading leading-[0.9] md:leading-[0.85] tracking-tighter">
+                            SECURE <br /> <span className="text-foreground/10 italic">GATEWAY.</span>
+                        </h1>
+                    </div>
+
+                        <div className="p-8 md:p-12 rounded-[32px] md:rounded-[48px] glass-pro border border-white/5 relative overflow-hidden group shadow-2xl shadow-black/[0.02]">
+                        
+                        <div className="absolute inset-x-0 h-px top-0 bg-gradient-to-r from-transparent via-foreground/5 to-transparent" />
+                        
+                        <div className="flex justify-between items-start mb-10 md:mb-12">
+                            <div>
+                                <p className="text-[10px] md:text-[11px] font-heading font-black text-foreground/30 uppercase tracking-[0.4em] mb-3">Service Category</p>
+                                <h2 className="text-2xl md:text-3xl font-heading font-black text-heading uppercase tracking-tighter">{state.service}</h2>
+                            </div>
+                            <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-foreground/[0.03] flex items-center justify-center border border-foreground/[0.05] group-hover:bg-foreground group-hover:text-background transition-all duration-500">
+                                <Zap className="w-5 h-5 md:w-6 md:h-6" />
+                            </div>
+                        </div>
+
+                        <div className="space-y-6 md:space-y-8">
+                            {state.details.map((detail, idx) => (
+                                <div key={idx} className="flex justify-between items-center group/item">
+                                    <span className="text-[9px] md:text-[10px] font-body font-black text-muted-foreground uppercase tracking-[0.3em] opacity-30 group-hover/item:opacity-80 transition-opacity">
+                                        {detail.label}
+                                    </span>
+                                    <span className="text-base md:text-lg font-heading font-black text-heading group-hover/item:translate-x-[-4px] transition-transform tracking-tight">
+                                        {detail.value}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="h-px w-full border-t border-dashed border-foreground/10 my-8 md:my-10" />
+
+                        {state.image && (
+                          <div className="mb-8 md:mb-10 space-y-6">
+                            <p className="text-[10px] md:text-[11px] font-heading font-black text-foreground/30 uppercase tracking-[0.4em]">Asset Ingress Preview</p>
+                            <div className="flex gap-4">
+                              {typeof state.image === 'string' ? (
+                                <div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden border border-foreground/10 bg-foreground/[0.02]">
+                                  <img src={state.image} alt="Asset" className="w-full h-full object-cover" />
+                                </div>
+                              ) : (
+                                <>
+                                  {state.image.front && (
+                                    <div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden border border-foreground/10 bg-foreground/[0.02]">
+                                      <img src={state.image.front} alt="Front" className="w-full h-full object-cover" />
+                                    </div>
+                                  )}
+                                  {state.image.back && (
+                                    <div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden border border-foreground/10 bg-foreground/[0.02]">
+                                      <img src={state.image.back} alt="Back" className="w-full h-full object-cover" />
+                                    </div>
+                                  )}
+                                </>
+                              )}
+                            </div>
+                            <div className="h-px w-full border-t border-dashed border-foreground/10" />
+                          </div>
+                        )}
+
+                        <div className="flex justify-between items-end">
+                            <div>
+                                <p className="text-[10px] md:text-[11px] font-heading font-black text-foreground/30 uppercase tracking-[0.4em] mb-2">Total Yield</p>
+                                <p className="text-[9px] md:text-[10px] text-muted-foreground/20 font-body font-black uppercase tracking-[0.3em]">Vault Rights Included</p>
+                            </div>
+                            <span className="text-5xl md:text-7xl font-heading font-black text-heading tabular-nums tracking-tighter shadow-black/[0.01]">
+                                ₹{state.price.toLocaleString()}
+                            </span>
+                        </div>
+                    </div>
+                  </div>
+
+                  {/* Security Badge — Archival Verification */}
+                  <div className="flex flex-col md:flex-row items-center md:items-start gap-8 p-8 md:p-10 rounded-[32px] bg-foreground/[0.015] border border-foreground/[0.03] overflow-hidden relative">
+                      <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-foreground/5 to-transparent" />
+                      <div className="w-14 h-14 rounded-2xl bg-foreground/[0.03] border border-foreground/[0.05] flex items-center justify-center text-foreground/30 shrink-0">
+                          <ShieldCheck strokeWidth={1.5} className="w-8 h-8" />
+                      </div>
+                      <div className="flex-1 text-center md:text-left">
+                          <p className="text-[10px] md:text-[11px] font-heading font-black text-heading uppercase tracking-[0.3em] mb-3">Encrypted Payload</p>
+                          <p className="text-[10px] text-muted-foreground/40 font-body font-bold uppercase tracking-[0.2em] leading-relaxed">Pozhi Digital Vaults secure your assets with archival studio encryption protocols. All handshakes are logged and verified.</p>
+                      </div>
+                  </div>
+                </div>
+
+                {/* Right Side — Form — Identification Terminal */}
+                <div className="glass-pro p-8 md:p-16 rounded-[40px] md:rounded-[60px] border border-white/5 shadow-2xl shadow-black/[0.01]">
+                  <div className="flex items-center gap-6 mb-16">
+                    <div className="w-12 h-12 rounded-2xl bg-foreground text-background flex items-center justify-center font-heading font-black text-lg">
+                        01
+                    </div>
+                    <div>
+                        <h2 className="text-2xl font-heading font-black text-heading uppercase tracking-tighter">Handshake Auth</h2>
+                        <p className="text-[10px] text-muted-foreground/40 font-body font-bold uppercase tracking-[0.4em] mt-1">Personal Identification</p>
+                    </div>
+                  </div>
+
+                  <form onSubmit={handleSubmit} className="space-y-12">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                        {/* Name Input */}
+                        <div className="group relative">
+                            <label className="text-[10px] font-heading font-black text-foreground/20 uppercase tracking-[0.4em] block mb-2 px-1">Identity String</label>
+                            <input
+                            required
+                            type="text"
+                            placeholder="NAME / ALIAS"
+                            className="w-full bg-foreground/[0.02] border border-foreground/[0.05] rounded-2xl px-6 py-5 font-heading font-black text-lg focus:outline-none focus:bg-white focus:border-foreground/10 transition-all placeholder:text-foreground/5 placeholder:font-black tracking-tighter"
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            />
+                        </div>
+                        
+                        {/* Mobile Input */}
+                        <div className="group relative">
+                            <label className="text-[10px] font-heading font-black text-foreground/20 uppercase tracking-[0.4em] block mb-2 px-1">Relay Link</label>
+                            <input
+                            required
+                            type="tel"
+                            placeholder="+91-000000000"
+                            className="w-full bg-foreground/[0.02] border border-foreground/[0.05] rounded-2xl px-6 py-5 font-heading font-black text-lg focus:outline-none focus:bg-white focus:border-foreground/10 transition-all placeholder:text-foreground/5 placeholder:font-black tracking-tighter"
+                            value={formData.mobile}
+                            onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="group relative">
+                         <label className="text-[10px] font-heading font-black text-foreground/20 uppercase tracking-[0.4em] block mb-2 px-1">Signal Route</label>
+                        <input
+                        required
+                        type="email"
+                        placeholder="E-MAIL@SECURE.COM"
+                        className="w-full bg-foreground/[0.02] border border-foreground/[0.05] rounded-2xl px-6 py-5 font-heading font-black text-lg focus:outline-none focus:bg-white focus:border-foreground/10 transition-all placeholder:text-foreground/5 placeholder:font-black tracking-tighter"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        />
+                    </div>
+
+                    <div className="group relative">
+                        <label className="text-[10px] font-heading font-black text-foreground/20 uppercase tracking-[0.4em] block mb-2 px-1">Deployment Target</label>
+                        <textarea
+                        required
+                        placeholder="GEOGRAPHIC COORDINATES / ADDRESS"
+                        rows={3}
+                        className="w-full bg-foreground/[0.02] border border-foreground/[0.05] rounded-3xl px-6 py-5 font-heading font-black text-lg focus:outline-none focus:bg-white focus:border-foreground/10 transition-all placeholder:text-foreground/5 placeholder:font-black tracking-tighter resize-none"
+                        value={formData.address}
+                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                        />
+                    </div>
+
+                    <div className="pt-10 flex flex-col gap-12">
+                        <div className="flex items-center gap-6">
+                            <div className="w-12 h-12 rounded-2xl bg-foreground/[0.03] border border-foreground/[0.05] flex items-center justify-center font-heading font-black text-foreground/30 text-lg">
+                                02
+                            </div>
+                            <div>
+                                <h2 className="text-2xl font-heading font-black text-heading uppercase tracking-tighter">Gateway Auth</h2>
+                                <p className="text-[10px] text-muted-foreground/40 font-body font-bold uppercase tracking-[0.4em] mt-1">UPI / SECURE Handshake</p>
+                            </div>
+                        </div>
+                        
+                        {/* High-End Archive QR Container */}
+                        <div className="p-10 rounded-[48px] glass-pro border border-white/5 flex flex-col items-center gap-8 relative group/qr overflow-hidden shadow-2xl shadow-black/[0.015]">
+                             {/* Subtle Paper Texture */}
+                            <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-multiply" 
+                                style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")` }} />
+
+                            <div className="absolute inset-x-0 h-px top-0 bg-gradient-to-r from-transparent via-foreground/5 to-transparent opacity-0 group-hover/qr:opacity-100 transition-opacity" />
+                            
+                            <div className="flex items-center gap-4 px-6 py-3 bg-foreground text-background rounded-2xl shadow-xl">
+                                <CreditCard className="w-4.5 h-4.5" />
+                                <span className="text-[11px] font-heading font-black tracking-[0.3em] uppercase mb-0.5">AUTHORIZE SIGNAL</span>
+                            </div>
+
+                            <div className="relative w-56 h-56 p-6 bg-white rounded-[48px] shadow-3xl shadow-black/[0.03] flex items-center justify-center transform group-hover/qr:scale-105 transition-transform duration-700">
+                                {/* Placeholder QR visual — High Fidelity */}
+                                <div className="w-full h-full bg-foreground/[0.015] rounded-[36px] border border-foreground/[0.03] flex flex-col items-center justify-center gap-4 relative overflow-hidden">
+                                    <div className="absolute inset-0 bg-gradient-to-tr from-foreground/[0.01] via-transparent to-transparent" />
+                                    <Terminal className="w-12 h-12 text-foreground/10" strokeWidth={1} />
+                                    <div className="flex flex-col items-center">
+                                         <p className="text-[10px] font-heading font-black text-foreground/40 uppercase tracking-widest mb-1">Awaiting scan</p>
+                                         <div className="flex gap-1">
+                                             <div className="w-1 h-1 rounded-full bg-foreground/20 animate-pulse" />
+                                             <div className="w-1 h-1 rounded-full bg-foreground/20 animate-pulse delay-75" />
+                                             <div className="w-1 h-1 rounded-full bg-foreground/20 animate-pulse delay-150" />
+                                         </div>
+                                    </div>
+                                </div>
+                                <div className="absolute top-4 right-4 group-hover/qr:rotate-12 transition-transform">
+                                     <Zap className="w-5 h-5 text-foreground/20 fill-current" />
+                                </div>
+                            </div>
+
+                            <p className="text-[11px] text-muted-foreground/60 font-body font-bold uppercase tracking-widest text-center mt-4 max-w-[280px] leading-relaxed opacity-60">
+                                Authorization will synchronize your session with our secure payment processor protocol.
+                            </p>
+                        </div>
+
+                        <button
+                        type="submit"
+                        className="w-full relative py-8 bg-foreground text-background font-heading font-black text-sm tracking-[0.5em] uppercase rounded-3xl hover:bg-black transition-all shadow-3xl flex items-center justify-center gap-6 group cursor-pointer overflow-hidden"
+                        >
+                            <div className="absolute inset-x-0 h-px top-0 bg-white/10 opacity-30 group-hover:opacity-100 transition-opacity" />
+                            <Lock className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                            IDENTIFY & SECURE
+                            <ChevronRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
+                        </button>
+                    </div>
+                  </form>
+                </div>
               </motion.div>
+            )}
+
+            {status === "processing" && (
+              <ProcessingOverlay />
+            )}
+
+            {status === "success" && (
+              <SuccessScreen userName={formData.name} mobile={formData.mobile} />
+            )}
+
+            {status === "failure" && (
+              <FailureScreen onRetry={() => setStatus("idle")} />
             )}
           </AnimatePresence>
         </div>
-      </motion.main>
+      </main>
     </>
   );
 };
-
-/* ─── Extracted form component ─── */
-
-interface CheckoutFormProps {
-  orderState: CheckoutState;
-  name: string;
-  setName: (v: string) => void;
-  mobile: string;
-  setMobile: (v: string) => void;
-  address: string;
-  setAddress: (v: string) => void;
-  eventDate: string;
-  setEventDate: (v: string) => void;
-  isGiftWrapped: boolean;
-  setIsGiftWrapped: (v: boolean) => void;
-  finalTotal: number;
-  isFormValid: boolean;
-  onPlaceOrder: () => void;
-}
-
-const CheckoutForm = ({
-  orderState,
-  name,
-  setName,
-  mobile,
-  setMobile,
-  address,
-  setAddress,
-  eventDate,
-  setEventDate,
-  isGiftWrapped,
-  setIsGiftWrapped,
-  finalTotal,
-  isFormValid,
-  onPlaceOrder,
-}: CheckoutFormProps) => (
-  <motion.div
-    variants={staggerContainer}
-    initial="initial"
-    animate="animate"
-    className="flex flex-col lg:flex-row gap-8 lg:gap-12"
-  >
-    {/* Left — Order Summary */}
-    <motion.div
-      variants={fadeSlideUp}
-      className="lg:w-[45%] lg:sticky lg:top-24 lg:self-start"
-    >
-      <div className="rounded-2xl border border-border bg-card p-6 md:p-8 space-y-6">
-        {/* Header with badge */}
-        <div className="flex items-center gap-3">
-          <h2 className="text-lg font-display font-bold text-heading">
-            Order Summary
-          </h2>
-          <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-accent text-primary text-xs font-semibold">
-            <CheckCircle className="w-3.5 h-3.5" />
-            Verified
-          </div>
-        </div>
-
-        {/* Product info */}
-        <div className="space-y-1">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-            {orderState.service}
-          </p>
-          <h3 className="text-xl font-display font-bold text-heading">
-            {orderState.title}
-          </h3>
-        </div>
-
-        {/* Details list */}
-        <div className="space-y-3 pt-4 border-t border-border">
-          {orderState.details.map((detail) => (
-            <div
-              key={detail.label}
-              className="flex items-center justify-between"
-            >
-              <span className="text-sm text-muted-foreground">
-                {detail.label}
-              </span>
-              <span className="text-sm font-medium text-foreground">
-                {detail.value}
-              </span>
-            </div>
-          ))}
-        </div>
-
-        {/* Gift Wrapping Toggle */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.4 }}
-          className="pt-4 border-t border-border"
-        >
-          <label
-            htmlFor="gift-wrap"
-            className="flex items-center justify-between cursor-pointer group"
-          >
-            <div className="flex items-center gap-3">
-              <Checkbox
-                id="gift-wrap"
-                checked={isGiftWrapped}
-                onCheckedChange={(checked) =>
-                  setIsGiftWrapped(checked === true)
-                }
-                className="h-5 w-5 rounded-md border-2 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-              />
-              <div className="flex items-center gap-2">
-                <AnimatePresence>
-                  {isGiftWrapped && (
-                    <motion.div
-                      initial={{ scale: 0, rotate: -30 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      exit={{ scale: 0, rotate: 30 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 15 }}
-                    >
-                      <Gift className="w-4 h-4 text-primary" />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-                <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
-                  Add Gift Wrapping?
-                </span>
-              </div>
-            </div>
-            <AnimatePresence mode="wait">
-              <motion.span
-                key={isGiftWrapped ? "added" : "price"}
-                initial={{ opacity: 0, x: 8 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -8 }}
-                transition={{ duration: 0.2 }}
-                className={`text-sm font-semibold tabular-nums ${
-                  isGiftWrapped ? "text-primary" : "text-muted-foreground"
-                }`}
-              >
-                +₹{GIFT_WRAP_PRICE}
-              </motion.span>
-            </AnimatePresence>
-          </label>
-        </motion.div>
-
-        {/* Total */}
-        <div className="pt-4 border-t border-border">
-          {isGiftWrapped && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="flex items-center justify-between mb-2"
-            >
-              <span className="text-xs text-muted-foreground">Subtotal</span>
-              <span className="text-xs text-muted-foreground tabular-nums">
-                ₹{orderState.price.toLocaleString()}
-              </span>
-            </motion.div>
-          )}
-          {isGiftWrapped && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="flex items-center justify-between mb-3"
-            >
-              <span className="text-xs text-muted-foreground flex items-center gap-1">
-                <Gift className="w-3 h-3" />
-                Gift Wrap
-              </span>
-              <span className="text-xs text-muted-foreground tabular-nums">
-                +₹{GIFT_WRAP_PRICE}
-              </span>
-            </motion.div>
-          )}
-          <div className="flex items-center justify-between">
-            <span className="text-base font-medium text-muted-foreground">
-              Total
-            </span>
-            <AnimatePresence mode="wait">
-              <motion.span
-                key={finalTotal}
-                initial={{ opacity: 0, y: -5 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-3xl font-display font-extrabold text-foreground tabular-nums"
-              >
-                ₹{finalTotal.toLocaleString()}
-              </motion.span>
-            </AnimatePresence>
-          </div>
-        </div>
-      </div>
-    </motion.div>
-
-    {/* Right — Customer Details & Payment */}
-    <motion.div variants={fadeSlideUp} className="lg:w-[55%] space-y-8">
-      {/* Customer Form */}
-      <div className="rounded-2xl border border-border bg-card p-6 md:p-8 space-y-6">
-        <h2 className="text-lg font-display font-bold text-heading">
-          Shipping & Payment
-        </h2>
-
-        <div className="space-y-4">
-          {/* Name */}
-          <div>
-            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">
-              Full Name *
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter your full name"
-              className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
-            />
-          </div>
-
-          {/* Mobile */}
-          <div>
-            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">
-              Mobile Number *
-            </label>
-            <div className="flex gap-2">
-              <div className="flex items-center px-3 rounded-xl border border-border bg-muted text-sm text-muted-foreground font-medium">
-                +91
-              </div>
-              <input
-                type="tel"
-                value={mobile}
-                onChange={(e) =>
-                  setMobile(
-                    e.target.value.replace(/\D/g, "").slice(0, 10)
-                  )
-                }
-                placeholder="Enter 10-digit number"
-                className="flex-1 px-4 py-3 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
-              />
-            </div>
-          </div>
-
-          {/* Address */}
-          <div>
-            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">
-              Delivery Address
-            </label>
-            <textarea
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              placeholder="Enter your delivery address"
-              rows={3}
-              className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm resize-none"
-            />
-          </div>
-
-          {/* Event date (only for bookings) */}
-          {orderState.isBooking && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              transition={{ duration: 0.3 }}
-            >
-              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 flex items-center gap-1">
-                <Calendar className="w-3.5 h-3.5" />
-                Date of Event
-              </label>
-              <input
-                type="date"
-                value={eventDate}
-                onChange={(e) => setEventDate(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
-              />
-            </motion.div>
-          )}
-        </div>
-      </div>
-
-      {/* Payment Section */}
-      <div className="rounded-2xl border border-border bg-card p-6 md:p-8 space-y-6 text-center">
-        <h2 className="text-lg font-display font-bold text-heading">
-          Scan to Pay via UPI
-        </h2>
-
-        {/* QR Placeholder */}
-        <div className="mx-auto w-48 h-48 rounded-2xl bg-muted border-2 border-dashed border-border flex items-center justify-center">
-          <QrCode className="w-20 h-20 text-muted-foreground/40" />
-        </div>
-
-        <p className="text-xs text-muted-foreground">
-          Scan the QR code with any UPI app to complete payment
-        </p>
-      </div>
-
-      {/* CTA */}
-      <motion.button
-        whileHover={{ scale: isFormValid ? 1.01 : 1 }}
-        whileTap={{ scale: isFormValid ? 0.97 : 1 }}
-        disabled={!isFormValid}
-        onClick={onPlaceOrder}
-        className={`w-full flex items-center justify-center gap-3 py-4 px-8 font-display font-bold text-lg rounded-xl shadow-md transition-all duration-300 ${
-          isFormValid
-            ? "bg-primary text-primary-foreground hover:shadow-lg"
-            : "bg-muted text-muted-foreground cursor-not-allowed"
-        }`}
-      >
-        <Lock className="w-5 h-5" />
-        Confirm & Place Order — ₹{finalTotal.toLocaleString()}
-      </motion.button>
-
-      <p className="text-center text-xs text-muted-foreground flex items-center justify-center gap-1.5">
-        <Lock className="w-3 h-3" />
-        Secure Payment via UPI
-      </p>
-    </motion.div>
-  </motion.div>
-);
 
 export default Checkout;

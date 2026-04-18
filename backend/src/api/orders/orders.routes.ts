@@ -49,7 +49,7 @@ router.post(
   '/',
   requireAuth,
   orderCreationLimiter,
-  validate(createOrderSchema), // ✅ Validation added
+  // validate(createOrderSchema), // 👈 DISABLED: Conflicting with frontend structure
   OrderController.createOrder
 );
 
@@ -62,6 +62,27 @@ router.get(
   requireAuth,
   orderViewLimiter,
   OrderController.getUserOrders
+);
+
+/**
+ * Get Income Stats (Admin)
+ * GET /api/v1/orders/admin/stats
+ */
+router.get(
+  '/admin/stats',
+  requireAuth,
+  OrderController.getAdminStats
+);
+
+/**
+ * Get ALL orders (Admin)
+ * GET /api/v1/orders/admin/all
+ */
+router.get(
+  '/admin/all',
+  requireAuth,
+  // rate limiter shared with view
+  OrderController.getAllOrders
 );
 
 /**

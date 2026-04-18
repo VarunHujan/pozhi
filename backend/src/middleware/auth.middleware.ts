@@ -6,7 +6,7 @@
 // ==========================================
 
 import { Request, Response, NextFunction } from 'express';
-import { supabase } from '../config/supabase';
+import { supabase, supabaseAdmin } from '../config/supabase';
 import { ApiError } from '../utils/ApiError';
 import { logger } from '../utils/logger';
 import { logSecurityEvent } from '../utils/securityLogger';
@@ -56,7 +56,7 @@ export const optionalAuth = async (
         ip: req.ip,
         path: req.path
       });
-      
+
       // Continue without user (optional auth)
       return next();
     }
@@ -66,11 +66,12 @@ export const optionalAuth = async (
     }
 
     // Get user profile
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('role, is_banned')
       .eq('id', user.id)
-      .single();
+      .limit(1)
+      .maybeSingle();
 
     if (profileError) {
       // ✅ LOG DATABASE ERRORS
@@ -127,8 +128,8 @@ export const optionalAuth = async (
     });
 
     // ⚠️ Alert admin about system issues
-    if (error.message.includes('ECONNREFUSED') || 
-        error.message.includes('timeout')) {
+    if (error.message.includes('ECONNREFUSED') ||
+      error.message.includes('timeout')) {
       logger.error('🚨 CRITICAL: Supabase connection issue!', {
         error: error.message,
         timestamp: new Date().toISOString()
@@ -179,7 +180,7 @@ export const requireAuth = async (
     if (error) {
       // ✅ DIFFERENTIATE TOKEN ERRORS
       const isExpired = error.message.toLowerCase().includes('expired');
-      const errorMessage = isExpired 
+      const errorMessage = isExpired
         ? 'Token has expired. Please login again.'
         : 'Invalid authentication token';
 
@@ -212,11 +213,12 @@ export const requireAuth = async (
     }
 
     // ✅ GET USER PROFILE
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('role, is_banned')
       .eq('id', user.id)
-      .single();
+      .limit(1)
+      .maybeSingle();
 
     if (profileError) {
       // ✅ LOG DATABASE ERROR
@@ -279,8 +281,8 @@ export const requireAuth = async (
       });
 
       // ⚠️ Alert on critical failures
-      if (error.message.includes('ECONNREFUSED') || 
-          error.message.includes('timeout')) {
+      if (error.message.includes('ECONNREFUSED') ||
+        error.message.includes('timeout')) {
         logger.error('🚨 CRITICAL: Supabase connection issue!', {
           error: error.message,
           timestamp: new Date().toISOString()
@@ -352,7 +354,7 @@ export const requireCustomer = (
   }
 
   const allowedRoles = ['customer', 'admin'];
-  
+
   if (!allowedRoles.includes(req.user.role)) {
     throw new ApiError(403, 'Customer access required');
   }

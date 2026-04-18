@@ -9,8 +9,12 @@ import {
     getFramesPricing,
     getAlbumPricing,
     getSnapnPrintPricing,
-    getAllPricing
+    getAllPricing,
+    updatePrice
 } from './pricing.controller';
+import { requireAuth } from '../../middleware/auth.middleware';
+import { validate } from '../../middleware/validate';
+import { updatePriceSchema } from './pricing.validation';
 
 const router = Router();
 
@@ -57,5 +61,17 @@ router.get('/snapnprint', getSnapnPrintPricing);
  * @access  Public
  */
 router.get('/all', getAllPricing);
+
+/**
+ * @route   PATCH /api/pricing/update
+ * @desc    Update product price (Admin only)
+ * @access  Private (Admin)
+ */
+router.patch(
+    '/update',
+    requireAuth,
+    validate(updatePriceSchema),
+    updatePrice
+);
 
 export default router;

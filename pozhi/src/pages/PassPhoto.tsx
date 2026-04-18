@@ -7,6 +7,7 @@ import CategoryTabs from "@/components/passphoto/CategoryTabs";
 import PackSelector from "@/components/passphoto/PackSelector";
 import PhotoPreview from "@/components/passphoto/PhotoPreview";
 import { fetchPassPhotoPricing, type PassPhotoCategory } from "@/services/api";
+import { useCart } from "@/contexts/CartContext";
 
 const PassPhoto = () => {
   const navigate = useNavigate();
@@ -15,6 +16,8 @@ const PassPhoto = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
   const [selectedPackIds, setSelectedPackIds] = useState<Record<string, string>>({});
+  const [uploadId, setUploadId] = useState<string | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   // Fetch pricing from API on mount
   useEffect(() => {
@@ -64,20 +67,49 @@ const PassPhoto = () => {
     setSelectedPackIds((prev) => ({ ...prev, [selectedCategoryId]: pack.id }));
   };
 
-  const handleBuyNow = () => {
+  const handleUploadComplete = (id: string, url: string) => {
+    console.log('[PassPhoto] Upload complete:', { id, url });
+    setUploadId(id);
+    setImageUrl(url);
+  };
+
+  const handleClear = () => {
+    setUploadId(null);
+    setImageUrl(null);
+  };
+
+  /* New Cart Logic */
+  const { addItem } = useCart();
+
+  const handleAddToCart = () => {
     if (!currentCategory || !currentPack) return;
 
-    navigate("/checkout", {
-      state: {
-        service: "PassPhoto",
-        title: `${currentCategory.label} — ${currentPack.label}`,
-        details: [
-          { label: "Size", value: currentCategory.aspectLabel },
-          { label: "Copies", value: String(currentPack.copies) },
-        ],
-        price: currentPack.price,
-      },
+    // 🛑 VALIDATION: Image upload is mandatory
+    if (!uploadId) {
+      alert("Please upload a photo to continue.");
+      return;
+    }
+
+    addItem({
+      service: "PassPhoto",
+      title: `${currentCategory.label} — ${currentPack.label}`,
+      details: [
+        { label: "Size", value: currentCategory.aspectLabel },
+        { label: "Copies", value: String(currentPack.copies) },
+      ],
+      price: currentPack.price,
+      quantity: 1,
+      uploadId: uploadId || undefined,
+      metadata: {
+        passphoto_pack_id: currentPack.id
+      }
+      // previewUrl: Upload component doesn't expose URL directly here yet, but we can pass it if we store it in state
     });
+  };
+
+  const handleBuyNow = () => {
+    handleAddToCart();
+    navigate("/checkout");
   };
 
   // Loading State
@@ -136,7 +168,13 @@ const PassPhoto = () => {
               transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] as const }}
               className="lg:w-[45%] lg:sticky lg:top-24 lg:self-start"
             >
-              <PhotoPreview category={currentCategory} selectedPack={currentPack} />
+              <PhotoPreview
+                category={currentCategory}
+                selectedPack={currentPack}
+                imageUrl={imageUrl}
+                onUploadComplete={handleUploadComplete}
+                onClear={handleClear}
+              />
             </motion.div>
 
             {/* Right Column — Controls */}
@@ -204,14 +242,22 @@ const PassPhoto = () => {
               </div>
 
               {/* CTA — desktop */}
-              <div className="hidden lg:block pt-4">
+              <div className="hidden lg:flex gap-4 pt-4">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={handleAddToCart}
+                  className="flex-1 flex items-center justify-center gap-2 py-4 px-6 bg-secondary text-secondary-foreground font-display font-bold text-lg rounded-xl shadow-sm hover:shadow-md transition-all"
+                >
+                  <ShoppingCart className="w-5 h-5" />
+                  Add to Cart
+                </motion.button>
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={handleBuyNow}
-                  className="w-full flex items-center justify-center gap-3 py-4 px-8 bg-primary text-primary-foreground font-display font-bold text-lg rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300"
+                  className="flex-1 flex items-center justify-center gap-2 py-4 px-6 bg-primary text-primary-foreground font-display font-bold text-lg rounded-xl shadow-md hover:shadow-lg transition-all"
                 >
-                  <ShoppingCart className="w-5 h-5" />
                   Buy Now
                 </motion.button>
               </div>
@@ -221,14 +267,21 @@ const PassPhoto = () => {
       </motion.main>
 
       {/* Mobile sticky CTA */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-card/80 backdrop-blur-xl border-t border-border z-40">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-card/80 backdrop-blur-xl border-t border-border z-40 flex gap-3">
+        <motion.button
+          whileTap={{ scale: 0.98 }}
+          onClick={handleAddToCart}
+          className="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-secondary text-secondary-foreground font-display font-bold text-base rounded-xl shadow-sm"
+        >
+          <ShoppingCart className="w-5 h-5" />
+          Add
+        </motion.button>
         <motion.button
           whileTap={{ scale: 0.98 }}
           onClick={handleBuyNow}
-          className="w-full flex items-center justify-center gap-3 py-4 px-8 bg-primary text-primary-foreground font-display font-bold text-base rounded-xl shadow-md"
+          className="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-primary text-primary-foreground font-display font-bold text-base rounded-xl shadow-md"
         >
-          <ShoppingCart className="w-5 h-5" />
-          Buy Now — ₹{currentPack.price}
+          Buy Now
         </motion.button>
       </div>
     </>

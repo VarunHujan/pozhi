@@ -1,35 +1,36 @@
+
 import app from './app';
 import { env } from './config/env';
-import { createServer } from 'http';
+import { logger } from './utils/logger';
+import { testSupabaseConnection } from './config/supabase';
 
-// Create the HTTP server
-const httpServer = createServer(app);
+// Helper to start server
+const startServer = async () => {
+  try {
+    // Test database connection
+    // const isDbConnected = await testSupabaseConnection();
+    // if (!isDbConnected) {
+    //   logger.error('Database connection failed. Exiting...');
+    //   process.exit(1);
+    // }
 
-// Start listening
-const PORT = Number(env.PORT) || 5000;
+    const PORT = env.PORT || 5000;
 
-console.log('🚀 Starting server initialization...');
-const server = httpServer.listen(PORT, () => {
-  console.log(`
-  ################################################
-  🛡️  Server listening on port: ${PORT} 🛡️ 
-  👉  http://localhost:${PORT}
-  ################################################
-  `);
-});
+    const server = app.listen(PORT, () => {
+      logger.info(`Server running in ${env.NODE_ENV} mode on port ${PORT}`);
+    });
 
-// 🚒 Error Handling: Uncaught Exceptions (Synchronous code errors)
-process.on('uncaughtException', (err) => {
-  console.error('UNCAUGHT EXCEPTION! 💥 Shutting down...');
-  console.error(err.name, err.message);
-  process.exit(1);
-});
+    // Handle unhandled promise rejections
+    process.on('unhandledRejection', (err: Error) => {
+      logger.error(`Error: ${err.message}`);
+      // Close server & exit process
+      server.close(() => process.exit(1));
+    });
 
-// 🚒 Error Handling: Unhandled Rejections (Async Promise errors)
-process.on('unhandledRejection', (err: any) => {
-  console.error('UNHANDLED REJECTION! 💥 Shutting down...');
-  console.error(err.name, err.message);
-  server.close(() => {
+  } catch (error) {
+    logger.error('Failed to start server:', error);
     process.exit(1);
-  });
-});
+  }
+};
+
+startServer();

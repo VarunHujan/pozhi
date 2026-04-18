@@ -9,8 +9,11 @@ import SinglePhotoSelector from "@/components/photocopies/SinglePhotoSelector";
 import SetPhotoSelector from "@/components/photocopies/SetPhotoSelector";
 import { fetchPhotoCopiesPricing, type PhotoCopySingle, type PhotoCopySet } from "@/services/api";
 
+import { useCart } from "@/contexts/CartContext";
+
 const PhotoCopies = () => {
   const navigate = useNavigate();
+  const { addItem } = useCart();
   const [singleOptions, setSingleOptions] = useState<PhotoCopySingle[]>([]);
   const [setSizes, setSetSizes] = useState<PhotoCopySet[]>([]);
   const [loading, setLoading] = useState(true);
@@ -20,41 +23,51 @@ const PhotoCopies = () => {
   const [selectedSingleId, setSelectedSingleId] = useState("");
   const [selectedSetId, setSelectedSetId] = useState("");
   const [quantity, setQuantity] = useState(1);
+  const [uploadId, setUploadId] = useState<string | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
-  // Fetch pricing from API
   useEffect(() => {
-    async function loadPricing() {
+    const loadData = async () => {
       try {
-        setLoading(true);
         const data = await fetchPhotoCopiesPricing();
-        setSingleOptions(data.single);
-        setSetSizes(data.set);
+        console.log("Photo Copies data loaded:", data);
+        const single = data?.single || [];
+        const sets = data?.set || [];
 
-        // Initialize selections
-        if (data.single.length > 0) {
-          setSelectedSingleId(data.single[0].id);
-        }
-        if (data.set.length > 0) {
-          setSelectedSetId(data.set[0].id);
-        }
+        setSingleOptions(single);
+        setSetSizes(sets);
+
+        // Defaults
+        if (single.length > 0) setSelectedSingleId(single[0].id);
+        if (sets.length > 0) setSelectedSetId(sets[0].id);
       } catch (err) {
-        console.error("Failed to load pricing:", err);
-        setError("Failed to load pricing. Please try again later.");
+        console.error("Failed to load photocopies pricing:", err);
+        setError("Failed to load pricing configurations.");
       } finally {
         setLoading(false);
       }
-    }
-
-    loadPricing();
+    };
+    loadData();
   }, []);
 
+  const handleUploadComplete = (id: string, url: string) => {
+    console.log('[PhotoCopies] Upload complete:', { id, url });
+    setUploadId(id);
+    setImageUrl(url);
+  };
+
+  const handleClear = () => {
+    setUploadId(null);
+    setImageUrl(null);
+  };
+
   const currentSingle = useMemo(
-    () => singleOptions.find((o) => o.id === selectedSingleId),
+    () => singleOptions?.find((o) => o.id === selectedSingleId),
     [singleOptions, selectedSingleId]
   );
 
   const currentSet = useMemo(
-    () => setSizes.find((s) => s.id === selectedSetId),
+    () => setSizes?.find((s) => s.id === selectedSetId),
     [setSizes, selectedSetId]
   );
 
@@ -68,71 +81,77 @@ const PhotoCopies = () => {
   const currentSizeLabel =
     activeTab === "single" ? currentSingle?.sizeLabel : currentSet?.sizeLabel;
 
-  const handleBuyNow = () => {
-    if (!currentSingle && !currentSet) return;
+  const handleUploadCompleteData = (id: string, url: string) => {
+    console.log('[PhotoCopies] Upload complete:', { id, url });
+    setUploadId(id);
+    setImageUrl(url);
+  };
+
+  const handleAddToCart = () => {
+    if ((activeTab === "single" && !currentSingle) || (activeTab === "set" && !currentSet)) return;
+
+    // 🛑 VALIDATION: Image upload is mandatory
+    if (!uploadId) {
+      alert("Please upload a document or photo to continue.");
+      return;
+    }
 
     const copiesPerUnit = activeTab === "set" ? (currentSet?.copiesPerUnit ?? 1) : 1;
     const totalCopies = activeTab === "set" ? quantity * copiesPerUnit : undefined;
 
-    navigate("/checkout", {
-      state: {
-        service: "Photo Copies",
-        title:
-          activeTab === "single"
-            ? `${currentSingle?.sizeLabel} — ${currentSingle?.copies}`
-            : `${currentSet?.sizeLabel} — Set of ${quantity}`,
-        details:
-          activeTab === "single"
-            ? [
-                { label: "Size", value: currentSingle?.sizeLabel || "" },
-                { label: "Pack", value: currentSingle?.copies || "" },
-              ]
-            : [
-                { label: "Size", value: currentSet?.sizeLabel || "" },
-                { label: "Quantity", value: String(quantity) },
-                { label: "Per Piece", value: `₹${currentSet?.pricePerPiece}` },
-                ...(totalCopies && copiesPerUnit > 1
-                  ? [{ label: "Total Copies", value: String(totalCopies) }]
-                  : []),
-              ],
-        price: totalPrice,
-      },
+    const title = activeTab === "single"
+      ? `${currentSingle?.sizeLabel} — ${currentSingle?.copies}`
+      : `${currentSet?.sizeLabel} — Set of ${quantity}`;
+
+    const details = activeTab === "single"
+      ? [
+        { label: "Size", value: currentSingle?.sizeLabel || "" },
+        { label: "Pack", value: currentSingle?.copies || "" },
+      ]
+      : [
+        { label: "Size", value: currentSet?.sizeLabel || "" },
+        { label: "Quantity", value: String(quantity) },
+        { label: "Per Piece", value: `₹${currentSet?.pricePerPiece}` },
+        ...(totalCopies && copiesPerUnit > 1
+          ? [{ label: "Total Copies", value: String(totalCopies) }]
+          : []),
+      ];
+
+    addItem({
+      service: "PhotoCopies",
+      title,
+      details,
+      price: totalPrice,
+      quantity: 1,
+      uploadId: uploadId || undefined,
+      metadata: {
+        photocopies_single_id: activeTab === "single" ? currentSingle?.id : undefined,
+        photocopies_set_id: activeTab === "set" ? currentSet?.id : undefined
+      }
     });
   };
 
-  // Loading State
+  const handleBuyNow = () => {
+    handleAddToCart();
+    navigate("/checkout");
+  };
+
   if (loading) {
     return (
-      <>
-        <Navbar visible={true} />
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-primary" />
-            <p className="text-lg text-muted-foreground">Loading pricing...</p>
-          </div>
-        </div>
-      </>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
     );
   }
 
-  // Error State
-  if (error || !currentSingle || !currentSet) {
+  if (error) {
     return (
-      <>
-        <Navbar visible={true} />
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center max-w-md px-4">
-            <h2 className="text-2xl font-bold mb-4">Oops!</h2>
-            <p className="text-muted-foreground mb-6">{error || "Something went wrong"}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition"
-            >
-              Try Again
-            </button>
-          </div>
-        </div>
-      </>
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
+        <p className="text-destructive font-medium">{error}</p>
+        <button onClick={() => window.location.reload()} className="text-sm underline">
+          Retry
+        </button>
+      </div>
     );
   }
 
@@ -157,8 +176,11 @@ const PhotoCopies = () => {
               className="lg:w-[45%] lg:sticky lg:top-24 lg:self-start"
             >
               <CopyPreview
-                aspectRatio={currentAspectRatio || "6/4"}
-                sizeLabel={currentSizeLabel || ""}
+                aspectRatio={currentAspectRatio || "1/1.414"}
+                sizeLabel={currentSizeLabel || "A4"}
+                imageUrl={imageUrl}
+                onUploadComplete={handleUploadComplete}
+                onClear={handleClear}
               />
             </motion.div>
 
@@ -199,8 +221,8 @@ const PhotoCopies = () => {
                 </AnimatePresence>
                 <span className="text-sm text-muted-foreground font-medium">
                   {activeTab === "set"
-                    ? `for ${quantity} ${quantity === 1 ? "piece" : "pieces"}`
-                    : currentSingle.copies.toLowerCase()}
+                    ? `for ${quantity} ${quantity === 1 ? "set" : "sets"}`
+                    : "per copy"}
                 </span>
               </div>
 
@@ -212,10 +234,13 @@ const PhotoCopies = () => {
                 <ModeTabs activeTab={activeTab} onSelect={setActiveTab} />
               </div>
 
+              {/* Image Upload */}
+              {/* Redundant ImageUpload removed as CopyPreview is interactive */}
+
               {/* Tab Content */}
               <div>
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                  {activeTab === "single" ? "Choose Option" : "Configure Set"}
+                  {activeTab === "single" ? "Configure Copy" : "Select Set"}
                 </p>
 
                 <AnimatePresence mode="wait">
@@ -240,14 +265,22 @@ const PhotoCopies = () => {
               </div>
 
               {/* CTA — desktop */}
-              <div className="hidden lg:block pt-4">
+              <div className="hidden lg:flex gap-4 pt-4">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={handleAddToCart}
+                  className="flex-1 flex items-center justify-center gap-2 py-4 px-6 bg-secondary text-secondary-foreground font-display font-bold text-lg rounded-xl shadow-sm hover:shadow-md transition-all"
+                >
+                  <ShoppingCart className="w-5 h-5" />
+                  Add to Cart
+                </motion.button>
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={handleBuyNow}
-                  className="w-full flex items-center justify-center gap-3 py-4 px-8 bg-primary text-primary-foreground font-display font-bold text-lg rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300"
+                  className="flex-1 flex items-center justify-center gap-2 py-4 px-6 bg-primary text-primary-foreground font-display font-bold text-lg rounded-xl shadow-md hover:shadow-lg transition-all"
                 >
-                  <ShoppingCart className="w-5 h-5" />
                   Buy Now
                 </motion.button>
               </div>
@@ -257,14 +290,21 @@ const PhotoCopies = () => {
       </motion.main>
 
       {/* Mobile sticky CTA */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-card/80 backdrop-blur-xl border-t border-border z-40">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-card/80 backdrop-blur-xl border-t border-border z-40 flex gap-3">
+        <motion.button
+          whileTap={{ scale: 0.98 }}
+          onClick={handleAddToCart}
+          className="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-secondary text-secondary-foreground font-display font-bold text-base rounded-xl shadow-sm"
+        >
+          <ShoppingCart className="w-5 h-5" />
+          Add
+        </motion.button>
         <motion.button
           whileTap={{ scale: 0.98 }}
           onClick={handleBuyNow}
-          className="w-full flex items-center justify-center gap-3 py-4 px-8 bg-primary text-primary-foreground font-display font-bold text-base rounded-xl shadow-md"
+          className="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-primary text-primary-foreground font-display font-bold text-base rounded-xl shadow-md"
         >
-          <ShoppingCart className="w-5 h-5" />
-          Buy Now — ₹{totalPrice}
+          Buy Now
         </motion.button>
       </div>
     </>

@@ -1,58 +1,59 @@
 import { motion } from "framer-motion";
-import { Check } from "lucide-react";
-import type { AlbumCapacity } from "@/lib/album-data";
+import type { AlbumCapacity } from "@/services/api";
 
 interface CapacitySelectorProps {
   capacities: AlbumCapacity[];
   selectedId: string;
-  onSelect: (capacity: AlbumCapacity) => void;
+  onSelect: (cap: AlbumCapacity) => void;
 }
 
 const CapacitySelector = ({ capacities, selectedId, onSelect }: CapacitySelectorProps) => {
   return (
-    <div className="grid grid-cols-2 gap-3">
-      {capacities.map((cap, index) => {
-        const isSelected = cap.id === selectedId;
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {capacities.map((cap, i) => {
+        const isSelected = selectedId === cap.id;
 
         return (
           <motion.button
             key={cap.id}
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.05, duration: 0.3 }}
+            transition={{ delay: i * 0.07, duration: 1, ease: [0.22, 1, 0.36, 1] }}
             onClick={() => onSelect(cap)}
-            className={`relative flex flex-col items-center gap-1 p-4 rounded-xl border-2 transition-all duration-200 group ${
+            className={`group relative p-6 rounded-2xl border transition-all duration-700 text-center cursor-pointer ${
               isSelected
-                ? "border-primary bg-accent shadow-sm"
-                : "border-border bg-card hover:border-primary/30 hover:bg-accent/30"
+                ? "border-foreground bg-foreground text-background shadow-2xl shadow-black/[0.05]"
+                : "border-foreground/5 bg-foreground/[0.01] hover:border-foreground/20 hover:bg-foreground/[0.03] text-foreground"
             }`}
           >
-            {/* Check badge */}
+            <div className="relative z-10">
+              <span className={`block text-3xl font-heading font-black mb-1 transition-colors ${
+                isSelected ? "text-background" : "text-heading"
+              }`}>
+                {cap.images}
+              </span>
+              <p className={`text-[10px] font-body font-bold uppercase tracking-[0.2em] opacity-40 transition-colors ${
+                isSelected ? "text-background/60" : "text-muted-foreground"
+              }`}>
+                Portraits
+              </p>
+            </div>
+
+            {/* Price reveal on selection */}
+            <div className={`absolute top-2 right-2 px-2 py-1 rounded-lg border border-white/10 bg-white/5 transition-opacity duration-500 ${
+                isSelected ? "opacity-100" : "opacity-0"
+            }`}>
+                 <span className="text-[8px] font-mono font-bold text-background/80">₹{cap.price}</span>
+            </div>
+
+             {/* Selected bloom */}
             {isSelected && (
               <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-primary flex items-center justify-center"
-              >
-                <Check className="w-3 h-3 text-primary-foreground" />
-              </motion.div>
+                layoutId="cap-selected-indicator"
+                className="absolute inset-0 bg-foreground rounded-2xl -z-0"
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              />
             )}
-
-            <span
-              className={`text-lg font-display font-bold tabular-nums transition-colors duration-200 ${
-                isSelected ? "text-primary" : "text-foreground"
-              }`}
-            >
-              {cap.images}
-            </span>
-            <span className="text-xs text-muted-foreground font-medium">Images</span>
-            <span
-              className={`text-sm font-bold font-display tabular-nums mt-1 ${
-                isSelected ? "text-primary" : "text-foreground"
-              }`}
-            >
-              ₹{cap.price.toLocaleString()}
-            </span>
           </motion.button>
         );
       })}

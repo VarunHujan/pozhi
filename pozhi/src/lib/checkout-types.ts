@@ -9,4 +9,5 @@ export interface CheckoutState {
   details: OrderDetail[];
   price: number;
   isBooking?: boolean;
+  uploadId?: string; // Optional: ID of uploaded image from ImageUpload component
 }
