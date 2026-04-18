@@ -94,8 +94,14 @@ async function fetchWithCache<T>(
     options: RequestInit = {},
     retries = 2
 ): Promise<T> {
-    // Ensure base URL doesn't end with slash and endpoint starts with one, avoiding double slashes
-    const cleanBaseUrl = API_BASE_URL.replace(/\/$/, '');
+    // Ensure base URL doesn't end with slash, avoiding double slashes
+    let cleanBaseUrl = API_BASE_URL.replace(/\/$/, '');
+
+    // Smart fix: If URL is in production but missing /api/v1, add it automatically
+    if (cleanBaseUrl.includes('onrender.com') && !cleanBaseUrl.includes('/api/v1')) {
+        cleanBaseUrl = `${cleanBaseUrl}/api/v1`;
+    }
+
     const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
     const url = `${cleanBaseUrl}${cleanEndpoint}`;
 

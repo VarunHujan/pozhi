@@ -22,6 +22,14 @@ export const errorHandler = (
     user: req.user?.id
   });
 
+  // CORS errors
+  if (err.message === 'Not allowed by CORS') {
+    return res.status(403).json({
+      success: false,
+      error: 'CORS policy: This origin is not allowed to access this resource.'
+    });
+  }
+
   // ApiError
   if (err instanceof ApiError) {
     return res.status(err.statusCode).json({
