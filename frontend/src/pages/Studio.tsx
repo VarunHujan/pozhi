@@ -8,7 +8,7 @@ import passphotoImg from "@/assets/services/passphoto.jpg";
 import photocopiesImg from "@/assets/services/photocopies.jpg";
 import albumImg from "@/assets/services/album.jpg";
 import framesImg from "@/assets/services/frames.jpg";
-import snapnprintImg from "@/assets/services/snapnprint.jpg";
+import snapnprintImg from "@/assets/services/snapnprint.png";
 
 const services = [
   {
