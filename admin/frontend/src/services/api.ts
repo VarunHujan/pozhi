@@ -3,7 +3,11 @@
 // ==========================================
 
 const BACKEND_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
-const API_BASE_URL = `${BACKEND_URL}/api/v1`;
+
+// Smart fix: Ensure the URL ends with /api/v1 for production connectivity
+const API_BASE_URL = BACKEND_URL.endsWith('/api/v1') 
+    ? BACKEND_URL 
+    : `${BACKEND_URL}/api/v1`;
 
 // ==========================================
 // PRICING API

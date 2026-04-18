@@ -65,6 +65,8 @@ app.use(hpp());
 const baseAllowedOrigins = [
   'https://pozhi.in',
   'https://www.pozhi.in',
+  'https://admin.pozhi.in',
+  'https://www.admin.pozhi.in',
   'https://luminia.com',
   'https://www.luminia.com'
 ];
