@@ -67,6 +67,7 @@ const baseAllowedOrigins = [
   'https://www.pozhi.in',
   'https://admin.pozhi.in',
   'https://www.admin.pozhi.in',
+  'https://pozhi-admin.netlify.app',
   'https://luminia.com',
   'https://www.luminia.com'
 ];
