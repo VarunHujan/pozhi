@@ -47,9 +47,9 @@ export const errorHandler = (
   }
 
   // Default error
-  res.status(500).json({
+  res.status((err as any).statusCode || 500).json({
     success: false,
-    error: 'Internal server error',
+    error: err.message || 'Internal server error',
     ...(env.NODE_ENV === 'development' && { stack: err.stack })
   });
 };
