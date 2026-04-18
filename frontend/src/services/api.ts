@@ -94,7 +94,10 @@ async function fetchWithCache<T>(
     options: RequestInit = {},
     retries = 2
 ): Promise<T> {
-    const url = `${API_BASE_URL}${endpoint}`;
+    // Ensure base URL doesn't end with slash and endpoint starts with one, avoiding double slashes
+    const cleanBaseUrl = API_BASE_URL.replace(/\/$/, '');
+    const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    const url = `${cleanBaseUrl}${cleanEndpoint}`;
 
     // Check cache for GET requests
     if (!options.method || options.method === 'GET') {

@@ -65,7 +65,9 @@ app.use(hpp());
 const allowedOrigins = env.NODE_ENV === 'production'
   ? [
     env.FRONTEND_URL || 'https://luminia.com',
-    'https://www.luminia.com'
+    'https://www.luminia.com',
+    'https://pozhi.in',
+    'https://www.pozhi.in'
   ]
   : [
     'http://localhost:5175',
