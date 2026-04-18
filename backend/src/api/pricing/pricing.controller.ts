@@ -25,13 +25,8 @@ export const getPassPhotoPricing = async (
             .order('display_order');
 
         if (catError) {
-            console.error('SUPABASE ERROR (Categories):', catError);
-            logger.error('Failed to fetch passphoto categories', { 
-                error: catError.message,
-                code: catError.code,
-                details: catError.details
-            });
-            throw new ApiError(500, `Failed to fetch categories: ${catError.message}`);
+            console.error('SUPABASE ERROR (PassPhoto Categories):', catError);
+            throw new ApiError(500, `Supabase Error: ${catError.message}`);
         }
 
         // Fetch all packs and group by category
@@ -42,13 +37,8 @@ export const getPassPhotoPricing = async (
             .order('display_order');
 
         if (packsError) {
-            console.error('SUPABASE ERROR (Packs):', packsError);
-            logger.error('Failed to fetch passphoto packs', { 
-                error: packsError.message,
-                code: packsError.code,
-                details: packsError.details
-            });
-            throw new ApiError(500, `Failed to fetch packs: ${packsError.message}`);
+            console.error('SUPABASE ERROR (PassPhoto Packs):', packsError);
+            throw new ApiError(500, `Supabase Error: ${packsError.message}`);
         }
 
         // Group packs by category
@@ -100,8 +90,8 @@ export const getPhotoCopiesPricing = async (
             .order('display_order');
 
         if (singleError) {
-            logger.error('Failed to fetch photocopies single', { error: singleError.message });
-            throw new ApiError(500, 'Failed to fetch pricing data');
+            console.error('SUPABASE ERROR (Single Options):', singleError);
+            throw new ApiError(500, `Supabase Error: ${singleError.message}`);
         }
 
         // Fetch set options
@@ -112,8 +102,8 @@ export const getPhotoCopiesPricing = async (
             .order('display_order');
 
         if (setError) {
-            logger.error('Failed to fetch photocopies set', { error: setError.message });
-            throw new ApiError(500, 'Failed to fetch pricing data');
+            console.error('SUPABASE ERROR (Set Options):', setError);
+            throw new ApiError(500, `Supabase Error: ${setError.message}`);
         }
 
         res.status(200).json({
@@ -163,8 +153,8 @@ export const getFramesPricing = async (
             .order('display_order');
 
         if (materialsError) {
-            logger.error('Failed to fetch frame materials', { error: materialsError.message });
-            throw new ApiError(500, 'Failed to fetch pricing data');
+            console.error('SUPABASE ERROR (Frame Materials):', materialsError);
+            throw new ApiError(500, `Supabase Error: ${materialsError.message}`);
         }
 
         // Fetch sizes
@@ -175,8 +165,8 @@ export const getFramesPricing = async (
             .order('display_order');
 
         if (sizesError) {
-            logger.error('Failed to fetch frame sizes', { error: sizesError.message });
-            throw new ApiError(500, 'Failed to fetch pricing data');
+            console.error('SUPABASE ERROR (Frame Sizes):', sizesError);
+            throw new ApiError(500, `Supabase Error: ${sizesError.message}`);
         }
 
         res.status(200).json({
@@ -222,8 +212,8 @@ export const getAlbumPricing = async (
             .order('display_order');
 
         if (error) {
-            logger.error('Failed to fetch album capacities', { error: error.message });
-            throw new ApiError(500, 'Failed to fetch pricing data');
+            console.error('SUPABASE ERROR (Album Capacities):', error);
+            throw new ApiError(500, `Supabase Error: ${error.message}`);
         }
 
         res.status(200).json({
@@ -262,8 +252,8 @@ export const getSnapnPrintPricing = async (
             .order('display_order');
 
         if (catError) {
-            logger.error('Failed to fetch snapnprint categories', { error: catError.message });
-            throw new ApiError(500, 'Failed to fetch pricing data');
+            console.error('SUPABASE ERROR (SnapnPrint Categories):', catError);
+            throw new ApiError(500, `Supabase Error: ${catError.message}`);
         }
 
         // Fetch packages
@@ -274,8 +264,8 @@ export const getSnapnPrintPricing = async (
             .order('display_order');
 
         if (packError) {
-            logger.error('Failed to fetch snapnprint packages', { error: packError.message });
-            throw new ApiError(500, 'Failed to fetch pricing data');
+            console.error('SUPABASE ERROR (SnapnPrint Packages):', packError);
+            throw new ApiError(500, `Supabase Error: ${packError.message}`);
         }
 
         // Group packages by category
