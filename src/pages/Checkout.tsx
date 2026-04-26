@@ -92,7 +92,7 @@ const Checkout = () => {
               Checkout
             </p>
             <h1 className="text-3xl md:text-4xl font-display font-extrabold text-heading leading-tight">
-              Verify & Pay
+              Review & Place Order
             </h1>
           </motion.div>
 
@@ -320,7 +320,7 @@ const CheckoutForm = ({
           )}
           <div className="flex items-center justify-between">
             <span className="text-base font-medium text-muted-foreground">
-              Total
+              Amount to Pay
             </span>
             <AnimatePresence mode="wait">
               <motion.span
@@ -342,7 +342,7 @@ const CheckoutForm = ({
       {/* Customer Form */}
       <div className="rounded-2xl border border-border bg-card p-6 md:p-8 space-y-6">
         <h2 className="text-lg font-display font-bold text-heading">
-          Shipping & Payment
+          Order Information
         </h2>
 
         <div className="space-y-4">
@@ -386,7 +386,7 @@ const CheckoutForm = ({
           {/* Address */}
           <div>
             <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">
-              Delivery Address
+              Delivery Address (Optional)
             </label>
             <textarea
               value={address}
@@ -419,20 +419,27 @@ const CheckoutForm = ({
         </div>
       </div>
 
-      {/* Payment Section */}
-      <div className="rounded-2xl border border-border bg-card p-6 md:p-8 space-y-6 text-center">
-        <h2 className="text-lg font-display font-bold text-heading">
-          Scan to Pay via UPI
-        </h2>
-
-        {/* QR Placeholder */}
-        <div className="mx-auto w-48 h-48 rounded-2xl bg-muted border-2 border-dashed border-border flex items-center justify-center">
-          <QrCode className="w-20 h-20 text-muted-foreground/40" />
+      {/* Trust Message Section */}
+      <div className="rounded-2xl border border-primary/20 bg-primary/5 p-6 md:p-8 space-y-4">
+        <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <CheckCircle className="w-5 h-5 text-primary" />
+            </div>
+            <h2 className="text-lg font-display font-bold text-heading text-left">
+              No Advance Payment Needed
+            </h2>
         </div>
 
-        <p className="text-xs text-muted-foreground">
-          Scan the QR code with any UPI app to complete payment
+        <p className="text-sm text-muted-foreground text-left leading-relaxed">
+          We believe in trust. Place your order now, and our team will get to work. 
+          Once your order is ready, we'll contact you for delivery. 
+          <strong> Pay only when you receive your photos.</strong>
         </p>
+        
+        <div className="flex items-center gap-2 text-xs font-medium text-primary">
+            <QrCode className="w-4 h-4" />
+            Cash or UPI on Delivery
+        </div>
       </div>
 
       {/* CTA */}
@@ -447,13 +454,12 @@ const CheckoutForm = ({
             : "bg-muted text-muted-foreground cursor-not-allowed"
         }`}
       >
-        <Lock className="w-5 h-5" />
-        Confirm & Place Order — ₹{finalTotal.toLocaleString()}
+        Place Order Now — ₹{finalTotal.toLocaleString()}
       </motion.button>
 
       <p className="text-center text-xs text-muted-foreground flex items-center justify-center gap-1.5">
-        <Lock className="w-3 h-3" />
-        Secure Payment via UPI
+        <CheckCircle className="w-3.5 h-3.5" />
+        Safe & Trust-Based Ordering
       </p>
     </motion.div>
   </motion.div>

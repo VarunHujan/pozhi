@@ -68,9 +68,9 @@ const PassPhoto = () => {
         service: "PassPhoto",
         title: `${currentCategory.label} — ${currentPack.label}`,
         details: [
-          { label: "Size Specification", value: currentCategory.aspectLabel },
-          { label: "Archival Copies", value: String(currentPack.copies) },
-          { label: "Asset Ingress", value: portraitImage ? "Verified" : "Pending" },
+          { label: "Size", value: currentCategory.aspectLabel },
+          { label: "Copies", value: String(currentPack.copies) },
+          { label: "Photo Status", value: portraitImage ? "Ready" : "Pending" },
         ],
         price: currentPack.price,
         image: portraitImage,
@@ -92,7 +92,7 @@ const PassPhoto = () => {
           </motion.div>
         </div>
         <p className="mt-8 text-[10px] tracking-[0.6em] uppercase text-muted-foreground/40 font-body font-bold">
-            Synchronizing Archivist
+            Setting the stage...
         </p>
       </div>
     );
@@ -105,15 +105,15 @@ const PassPhoto = () => {
           <div className="w-20 h-20 rounded-[32px] bg-foreground/[0.03] border border-foreground/[0.05] flex items-center justify-center mx-auto mb-10">
             <Info className="w-6 h-6 text-foreground/20" />
           </div>
-          <h2 className="text-3xl font-heading font-black text-heading mb-4 tracking-tight">Signal Interrupted.</h2>
+          <h2 className="text-3xl font-heading font-black text-heading mb-4 tracking-tight">Something went wrong.</h2>
           <p className="text-xs text-muted-foreground mb-12 font-body leading-relaxed uppercase tracking-widest opacity-60">
-            {error || "The studio synchronization protocol has failed."}
+            {error || "We're having trouble connecting to the studio."}
           </p>
           <button
             onClick={() => window.location.reload()}
             className="px-12 py-5 bg-foreground text-background text-[10px] font-black tracking-[0.4em] uppercase rounded-full hover:bg-black transition-all cursor-pointer shadow-2xl"
           >
-            Reconnect Terminal
+            Try Again
           </button>
         </div>
       </div>
@@ -231,7 +231,7 @@ const PassPhoto = () => {
                 >
                     <div className="absolute inset-x-0 h-px top-0 bg-white/10 opacity-30 group-hover:opacity-100 transition-opacity" />
                     <ShoppingCart className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                    Initialize Protocol
+                    Buy Now
                 </button>
                 
                 <div className="mt-12 flex flex-col items-center gap-6 opacity-30">

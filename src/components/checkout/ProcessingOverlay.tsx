@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
 const messages = [
-  "Verifying Payment...",
-  "Securing Slot...",
-  "Almost There...",
+  "Confirming your request...",
+  "Getting things ready for you...",
+  "Almost there...",
 ];
 
 const ProcessingOverlay = () => {

@@ -33,6 +33,7 @@ const envSchema = z.object({
 
   // Frontend
   FRONTEND_URL: z.string().url().optional(),
+  GOOGLE_AUTH_REDIRECT_URL: z.string().url().optional(),
 
   // WebAuthn / Passkey
   WEBAUTHN_RP_NAME: z.string().default('Pozhi Photography Studio'),

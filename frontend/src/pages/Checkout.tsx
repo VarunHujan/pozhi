@@ -177,7 +177,7 @@ const Checkout = () => {
                       </div>
                       <div className="flex-1 text-center md:text-left">
                           <p className="text-[10px] md:text-[11px] font-heading font-black text-heading uppercase tracking-[0.3em] mb-3">Encrypted Payload</p>
-                          <p className="text-[10px] text-muted-foreground/40 font-body font-bold uppercase tracking-[0.2em] leading-relaxed">Pozhi Digital Vaults secure your assets with archival studio encryption protocols. All handshakes are logged and verified.</p>
+                          <p className="text-[10px] text-muted-foreground/40 font-body font-bold uppercase tracking-[0.2em] leading-relaxed">Your photos are safe with us. We use professional-grade encryption to protect your memories.</p>
                       </div>
                   </div>
                 </div>
@@ -291,7 +291,7 @@ const Checkout = () => {
                             </div>
 
                             <p className="text-[11px] text-muted-foreground/60 font-body font-bold uppercase tracking-widest text-center mt-4 max-w-[280px] leading-relaxed opacity-60">
-                                Authorization will synchronize your session with our secure payment processor protocol.
+                                Your order will be sent directly to our studio team for immediate processing.
                             </p>
                         </div>
 

@@ -5,33 +5,33 @@ import Navbar from "@/components/Navbar";
 const roadmapItems = [
   {
     icon: Cpu,
-    title: "AI Retouching Core",
+    title: "AI Retouching",
     description:
-      "Intelligent neural enhancement protocols. Real-time skin correction, background synthesis, and archival style transfer.",
+      "Intelligent photo enhancement tools. Real-time skin correction, background synthesis, and classic style processing.",
     status: "In Development",
     statusColor: "text-orange-600/80 bg-orange-100/10 border-orange-200/20",
   },
   {
     icon: Camera,
-    title: "Aerial Reconnaissance",
+    title: "Drone Photography",
     description:
-      "Cinematic drone deployments for events, architecture, and landscape coverage. High-altitude perspectives redefined.",
+      "Professional drone services for events, architecture, and landscape coverage. Stunning high-altitude perspectives.",
     status: "Coming 2026",
     statusColor: "text-foreground/40 bg-foreground/[0.03] border-foreground/[0.05]",
   },
   {
     icon: Sparkles,
-    title: "AR Volumetric Preview",
+    title: "AR Frame Preview",
     description:
-      "Visualize your archival frames on-site with millimeter-precise AR placement. Real-time lighting integration for true fidelity.",
+      "Visualize your premium frames on-site with precise AR placement. See how it looks on your wall before you buy.",
     status: "Research",
     statusColor: "text-foreground/30 bg-foreground/[0.02] border-foreground/[0.04]",
   },
   {
     icon: Zap,
-    title: "Zero Latency Delivery",
+    title: "Express Delivery",
     description:
-      "Hyper-speed local printing and courier deployment. Archival prints delivered to your coordinate within the hour.",
+      "Hyper-speed local printing and delivery service. High-quality prints delivered to your doorstep within the hour.",
     status: "Planned",
     statusColor: "text-foreground/20 bg-foreground/[0.01] border-foreground/[0.03]",
   },
@@ -75,7 +75,7 @@ const Future = () => {
             className="mb-32"
           >
             <p className="text-[10px] font-body font-black text-muted-foreground/60 tracking-[0.5em] uppercase mb-12">
-              VISION // NEXT GENERATION
+              OUR VISION
             </p>
 
             <div className="overflow-hidden mb-8">
@@ -95,7 +95,7 @@ const Future = () => {
               transition={{ delay: 0.4, duration: 1 }}
               className="text-sm md:text-md text-muted-foreground/60 max-w-lg leading-relaxed font-body font-bold uppercase tracking-[0.2em] opacity-80"
             >
-              We are synthesizing the next frontier of optical excellence. A blueprint for innovations in imaging, access, and secure archival experiences.
+              We are building the next generation of photography. A roadmap for innovations in imaging, access, and premium archival experiences.
             </motion.p>
 
             <motion.div
@@ -169,7 +169,7 @@ const Future = () => {
                           <div>
                              <div className="flex items-center gap-3 mb-2 opacity-20">
                                 <CornerRightDown className="w-3 h-3" />
-                                <span className="text-[9px] font-mono tracking-widest uppercase mb-0.5">Deployment Sector</span>
+                                <span className="text-[9px] font-mono tracking-widest uppercase mb-0.5">Feature Type</span>
                              </div>
                              <h3 className="text-2xl md:text-3xl font-heading font-black text-heading tracking-tighter">
                                 {item.title}
@@ -207,7 +207,7 @@ const Future = () => {
              <div className="flex items-center justify-center gap-4 opacity-20 hover:opacity-100 transition-opacity duration-1000">
                 <ShieldCheck className="w-4 h-4" />
                 <p className="text-[10px] text-foreground font-heading font-black tracking-[0.5em] uppercase">
-                ADVANCED OPTICAL LABS // POZHI.NEXT
+                POZHI STUDIO NEXT
                 </p>
              </div>
           </motion.div>

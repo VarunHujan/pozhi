@@ -489,6 +489,104 @@ export const changePassword = async (
 };
 
 // ==========================================
+// GOOGLE OAUTH - Start flow
+// ==========================================
+
+export const loginWithGoogle = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    // Prevent browser caching of the redirect URL
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+
+    const redirectTo = env.GOOGLE_AUTH_REDIRECT_URL || `${env.FRONTEND_URL}/login`;
+    
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+      },
+    });
+
+    if (error) {
+      throw new ApiError(400, error.message);
+    }
+
+    // ✅ PERFORM SERVER-SIDE REDIRECT
+    if (data.url) {
+      return res.redirect(data.url);
+    }
+
+    throw new ApiError(500, 'Failed to generate Google login URL');
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ==========================================
+// EXCHANGE CODE - Complete OAuth flow
+// ==========================================
+
+export const exchangeCodeForSession = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { code } = req.body;
+
+    if (!code) {
+      throw new ApiError(400, 'OAuth code is required');
+    }
+
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+
+    if (error || !data.session) {
+      throw new ApiError(401, error?.message || 'Failed to exchange code for session');
+    }
+
+    // Get profile to check role and ban status
+    const { data: profile } = await supabaseAdmin
+      .from('profiles')
+      .select('is_banned, role, full_name')
+      .eq('id', data.user.id)
+      .single();
+
+    if (profile?.is_banned) {
+      await supabase.auth.signOut();
+      throw new ApiError(403, 'Your account has been suspended.');
+    }
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        user: {
+          id: data.user.id,
+          email: data.user.email,
+          full_name: profile?.full_name || data.user.user_metadata?.full_name,
+          role: profile?.role || 'customer'
+        },
+        session: {
+          access_token: data.session.access_token,
+          refresh_token: data.session.refresh_token,
+          expires_at: data.session.expires_at
+        }
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ==========================================
 // REFRESH TOKEN - Get new access token
 // ==========================================
 

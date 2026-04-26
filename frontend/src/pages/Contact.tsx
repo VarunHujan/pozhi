@@ -29,7 +29,7 @@ const Contact = () => {
 
   const copyToClipboard = (text: string, type: "email" | "phone") => {
     navigator.clipboard.writeText(text);
-    toast.success(`${type === "email" ? "Electronic mail route" : "Comm link"} copied to archive.`);
+    toast.success(`${type === "email" ? "Email address" : "Phone number"} copied to clipboard.`);
     if (type === "email") {
       setCopiedEmail(true);
       setTimeout(() => setCopiedEmail(false), 2000);
@@ -42,7 +42,7 @@ const Contact = () => {
   const contactItems = [
     {
       icon: Mail,
-      label: "Electronic Mail Route",
+      label: "Email Address",
       value: "hello@pozhi.studio",
       action: () => copyToClipboard("hello@pozhi.studio", "email"),
       copied: copiedEmail,
@@ -51,7 +51,7 @@ const Contact = () => {
     },
     {
       icon: Phone,
-      label: "Secure Communication Link",
+      label: "Phone Number",
       value: "+91 98765 43210",
       action: () => copyToClipboard("+91 98765 43210", "phone"),
       copied: copiedPhone,
@@ -85,10 +85,10 @@ const Contact = () => {
             className="mb-24"
           >
             <p className="text-[10px] font-body font-black text-muted-foreground/60 tracking-[0.5em] uppercase mb-8">
-              ESTABLISH CONNECTION
+              CONTACT US
             </p>
             <h1 className="text-4xl md:text-6xl font-heading font-black text-heading leading-[0.85] tracking-tighter mb-8">
-              Handshake <br /> <span className="text-foreground/10 italic">Inbound.</span>
+              Get in <br /> <span className="text-foreground/10 italic">Touch.</span>
             </h1>
             <motion.div
               initial={{ scaleX: 0 }}
@@ -167,19 +167,19 @@ const Contact = () => {
                 <div className="relative">
                    <div className="flex items-center gap-3 mb-6 opacity-20">
                       <Zap className="w-4 h-4 fill-current" />
-                      <span className="text-[10px] font-body font-black text-foreground uppercase tracking-[0.5em]">Protocol Trigger</span>
+                      <span className="text-[10px] font-body font-black text-foreground uppercase tracking-[0.5em]">STUDIO LINK</span>
                    </div>
                   <p className="text-2xl font-heading font-black text-heading tracking-tighter mb-4 uppercase">
-                    Ready to archive?
+                    Ready to book?
                   </p>
                   <p className="text-sm text-muted-foreground/60 leading-relaxed font-body font-bold uppercase tracking-widest mb-10 opacity-60">
-                    Walk into our atelier or establish a relay to book your next session. We specialize in framing your legacy.
+                    Walk into our studio or reach out to us to book your next session. We specialize in capturing your legacy.
                   </p>
                   <button
                     onClick={() => navigate("/studio")}
                     className="cursor-pointer flex items-center gap-4 text-[10px] font-heading font-black text-foreground tracking-[0.4em] uppercase hover:gap-6 transition-all duration-500 group/btn"
                   >
-                    DEPLOY SERVICES
+                    VIEW SERVICES
                     <ArrowRight className="w-4 h-4 transition-transform duration-500 group-hover/btn:translate-x-2" />
                   </button>
                 </div>
@@ -204,10 +204,10 @@ const Contact = () => {
                     </div>
                     <div>
                       <p className="text-[10px] text-muted-foreground/40 uppercase tracking-[0.4em] mb-2 font-body font-black">
-                        Studio Coordinates
+                        Our Location
                       </p>
                       <p className="text-2xl font-heading font-black text-heading uppercase tracking-tighter">
-                        Visit The Atelier
+                        Visit Our Studio
                       </p>
                     </div>
                   </div>
@@ -245,10 +245,10 @@ const Contact = () => {
                     </div>
                   </div>
 
-                  {/* Studio Ledger Hours */}
+                  {/* Studio Hours */}
                   <div className="pt-12 border-t border-foreground/[0.05]">
                     <div className="flex items-center gap-4 mb-8">
-                       <span className="text-[11px] font-heading font-black text-heading">OPENING PROTOCOLS</span>
+                       <span className="text-[11px] font-heading font-black text-heading">STUDIO HOURS</span>
                        <div className="w-12 h-px bg-foreground/10" />
                     </div>
                     <div className="space-y-4">
@@ -267,7 +267,7 @@ const Contact = () => {
 
                   <div className="mt-6 flex items-center gap-3 opacity-20">
                      <ShieldCheck className="w-4 h-4" />
-                     <p className="text-[9px] font-body font-black text-foreground uppercase tracking-[0.4em]">Handshake Protocol Verified</p>
+                     <p className="text-[9px] font-body font-black text-foreground uppercase tracking-[0.4em]">Secure Connection</p>
                   </div>
                 </div>
               </div>

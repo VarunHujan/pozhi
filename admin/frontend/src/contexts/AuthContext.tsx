@@ -21,6 +21,9 @@ interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
+  loginWithGoogle: () => Promise<string>;
+  completeGoogleLogin: (code: string) => Promise<void>;
+  completeGoogleLoginWithHash: (hash: string) => Promise<void>;
   loginWithPasskey: (email?: string) => Promise<void>;
   signup: (data: { email: string; password: string; full_name: string; phone?: string }) => Promise<void>;
   logout: () => Promise<void>;
@@ -164,6 +167,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(loggedInUser);
   }, []);
 
+  const loginWithGoogle = useCallback(async () => {
+    const { url } = await import('@/services/api').then(api => api.loginWithGoogle());
+    return url; // Return the URL so the UI can handle the redirect
+  }, []);
+
+  const completeGoogleLogin = useCallback(async (code: string) => {
+    const { user: loggedInUser, session } = await import('@/services/api').then(api => api.exchangeCodeForGoogleSession(code));
+    storeSession(session);
+    setUser(loggedInUser);
+  }, []);
+
+  const completeGoogleLoginWithHash = useCallback(async (hash: string) => {
+    const params = new URLSearchParams(hash.replace('#', '?'));
+    const access_token = params.get('access_token');
+    const refresh_token = params.get('refresh_token');
+    const expires_in = params.get('expires_in');
+
+    if (!access_token || !refresh_token) {
+      throw new Error("Invalid login URL parameters");
+    }
+
+    const expires_at = Math.floor(Date.now() / 1000) + Number(expires_in || 3600);
+
+    storeSession({ access_token, refresh_token, expires_at });
+
+    try {
+      const { user: currentUser } = await getCurrentUser();
+      if (currentUser.role !== 'admin') {
+        clearSession();
+        setUser(null);
+        throw new Error("Admin access required.");
+      }
+      setUser(currentUser);
+    } catch (err: any) {
+      clearSession();
+      setUser(null);
+      throw new Error(err.message || "Authentication failed.");
+    }
+  }, []);
+
   const loginWithPasskey = useCallback(async (email?: string) => {
     const { options, challengeId } = await getPasskeyLoginOptions(email);
     const credential = await startAuthentication({ optionsJSON: options });
@@ -190,7 +233,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, isAuthenticated, login, loginWithPasskey, signup, logout }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      isLoading, 
+      isAuthenticated, 
+      login, 
+      loginWithGoogle,
+      completeGoogleLogin,
+      completeGoogleLoginWithHash,
+      loginWithPasskey, 
+      signup, 
+      logout 
+    }}>
       {children}
     </AuthContext.Provider>
   );

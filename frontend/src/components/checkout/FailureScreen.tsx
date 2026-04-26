@@ -57,11 +57,11 @@ const FailureScreen = ({ onRetry }: FailureScreenProps) => {
         </h1>
         <div className="flex flex-col items-center gap-2">
             <p className="text-md text-muted-foreground font-body font-bold max-w-sm mx-auto opacity-80">
-                Verification failure detected during the digital handshake protocol.
+                We had some trouble connecting to the studio. Please try again.
             </p>
             <div className="flex items-center gap-3 mt-4 px-4 py-2 bg-orange-50 border border-orange-100 rounded-full">
                 <AlertCircle className="w-3.5 h-3.5 text-orange-600/60" />
-                <span className="text-[10px] font-heading font-black tracking-[0.3em] text-orange-600/80 uppercase">No charges applied to ledger</span>
+                <span className="text-[10px] font-heading font-black tracking-[0.3em] text-orange-600/80 uppercase">No charges applied</span>
             </div>
         </div>
       </motion.div>
@@ -92,7 +92,7 @@ const FailureScreen = ({ onRetry }: FailureScreenProps) => {
           className="flex items-center gap-4 px-12 py-6 rounded-3xl bg-foreground text-background font-heading font-black text-xs tracking-[0.4em] uppercase hover:bg-black transition-all shadow-3xl cursor-pointer group"
         >
           <RefreshCw className="w-5 h-5 group-hover:rotate-180 transition-transform duration-1000" />
-          Retry Protocol
+          Try Again
         </button>
 
         <button
@@ -100,7 +100,7 @@ const FailureScreen = ({ onRetry }: FailureScreenProps) => {
           className="flex items-center gap-4 px-10 py-6 rounded-3xl border border-foreground/[0.05] bg-foreground/[0.01] text-foreground font-heading font-black text-[11px] tracking-[0.34em] uppercase hover:bg-foreground hover:text-background transition-all cursor-pointer group"
         >
           <Home className="w-4.5 h-4.5 group-hover:scale-110 transition-transform" />
-          Terminate session
+          Go to Home
         </button>
       </motion.div>
       

@@ -55,8 +55,8 @@ const Album = () => {
         service: "Album",
         title: `Premium Album — ${currentCapacity.images} Images`,
         details: [
-          { label: "Volumetric Capacity", value: `${currentCapacity.images} Digital Mounts` },
-          { label: "Material Specification", value: coverType === "custom" ? "Bespoke Artisan" : "Studio Linen Ivory" },
+          { label: "Capacity", value: `${currentCapacity.images} Images` },
+          { label: "Material", value: coverType === "custom" ? "Custom Design" : "Classic Linen" },
         ],
         price: currentCapacity.price,
         image: { front: frontImage, back: backImage },
@@ -78,7 +78,7 @@ const Album = () => {
           </motion.div>
         </div>
         <p className="mt-8 text-[10px] tracking-[0.6em] uppercase text-muted-foreground/40 font-body font-bold">
-            Synchronizing Archivist
+            Setting the stage...
         </p>
       </div>
     );
@@ -91,15 +91,15 @@ const Album = () => {
            <div className="w-20 h-20 rounded-[32px] bg-foreground/[0.03] border border-foreground/[0.05] flex items-center justify-center mx-auto mb-10">
             <ShieldCheck className="w-6 h-6 text-foreground/20" />
           </div>
-          <h2 className="text-3xl font-heading font-black text-heading mb-4 tracking-tight">Access Restricted.</h2>
+          <h2 className="text-3xl font-heading font-black text-heading mb-4 tracking-tight">Something went wrong.</h2>
           <p className="text-xs text-muted-foreground mb-12 font-body leading-relaxed uppercase tracking-widest opacity-60">
-            {error || "The studio synchronization protocol has failed."}
+            {error || "We're having trouble connecting to the studio."}
           </p>
           <button
             onClick={() => window.location.reload()}
             className="px-12 py-5 bg-foreground text-background text-[10px] font-black tracking-[0.4em] uppercase rounded-full hover:bg-black transition-all cursor-pointer shadow-2xl"
           >
-            Re-Initialize Terminal
+            Try Again
           </button>
         </div>
       </div>
@@ -199,7 +199,7 @@ const Album = () => {
                     </div>
                     <div>
                         <p className="text-[11px] font-heading font-black text-heading uppercase tracking-[0.1em]">Extended Refill</p>
-                        <p className="text-[9px] text-muted-foreground/40 font-body uppercase tracking-widest font-bold">Consult with Studio Archivist</p>
+                        <p className="text-[9px] text-muted-foreground/40 font-body uppercase tracking-widest font-bold">Talk to our Team</p>
                     </div>
                 </div>
               </div>
@@ -280,7 +280,7 @@ const Album = () => {
                 >
                     <div className="absolute inset-x-0 h-px top-0 bg-white/10 opacity-30 group-hover:opacity-100 transition-opacity" />
                     <ShoppingCart className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                    Authorize Volume
+                    Confirm Order
                 </button>
                 <div className="flex justify-between items-center mt-12 px-2 opacity-30">
                     <div className="flex items-center gap-2">

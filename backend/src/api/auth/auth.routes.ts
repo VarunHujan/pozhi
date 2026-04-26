@@ -55,6 +55,12 @@ router.post(
   AuthController.login
 );
 
+// GET /api/v1/auth/google
+router.get('/google', AuthController.loginWithGoogle);
+
+// POST /api/v1/auth/google/exchange
+router.post('/google/exchange', AuthController.exchangeCodeForSession);
+
 // POST /api/v1/auth/refresh-token
 router.post(
   '/refresh-token', 

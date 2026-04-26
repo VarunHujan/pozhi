@@ -112,7 +112,7 @@ const About = () => {
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             className="text-[10px] font-body font-black text-muted-foreground/60 tracking-[0.5em] uppercase mb-12"
           >
-            THE ARTISAN MANIFESTO
+            OUR CRAFT
           </motion.p>
 
           {/* Editorial headline lines — clip reveal */}
@@ -157,12 +157,12 @@ const About = () => {
             {[
               {
                 title: "Artisan Mission",
-                text: "At Pozhi, we believe every pixel represents a legacy that deserves preservation. From biometric identification to heirloom wall frames, we deploy studio-grade craftsmanship to every asset we touch.",
+                text: "At Pozhi, we believe every photo represents a legacy that deserves preservation. From passport photos to heirloom wall frames, we bring studio-grade craftsmanship to every memory we touch.",
                 delay: 0.1,
               },
               {
                 title: "Studio Integrity",
-                text: "We synthesize cutting-edge optical technology with archival processing. Whether you walk into our atelier or book our mobile elite units, you receive nothing less than absolute fidelity — delivered with zero latency.",
+                text: "We combine professional equipment with archival processing. Whether you walk into our studio or book our mobile studio service, you receive nothing less than perfect quality — delivered without delay.",
                 delay: 0.22,
               },
             ].map((col) => (
@@ -213,7 +213,7 @@ const About = () => {
                 Light is the <span className="text-foreground/20 italic">Ultimate Artist</span>. We are merely its secure instruments of capture.
               </p>
               <footer className="mt-12 text-[10px] text-muted-foreground/40 tracking-[0.6em] uppercase font-body font-black">
-                — THE POZHI PROTOCOL
+                — OUR STUDIO PROMISE
               </footer>
             </blockquote>
           </motion.div>

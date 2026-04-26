@@ -425,6 +425,25 @@ export async function login(email: string, password: string): Promise<LoginRespo
     return json.data;
 }
 
+export async function loginWithGoogle(): Promise<{ url: string }> {
+    const response = await fetch(`${API_BASE_URL}/auth/google`);
+    const json = await response.json();
+    if (!response.ok) throw new Error(json.message || 'Google login failed');
+    return json.data;
+}
+
+export async function exchangeCodeForGoogleSession(code: string): Promise<LoginResponse> {
+    const response = await fetch(`${API_BASE_URL}/auth/google/exchange`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code }),
+    });
+
+    const json = await response.json();
+    if (!response.ok) throw new Error(json.message || 'OAuth exchange failed');
+    return json.data;
+}
+
 export async function signup(data: {
     email: string;
     password: string;

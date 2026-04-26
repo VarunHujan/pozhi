@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   MessageCircle, Check, Truck, User, X, Loader2, Download,
-  Phone, Calendar, Search,
+  Phone, Calendar, Search, MapPin,
   Clock, CreditCard, ChevronRight
 } from "lucide-react";
 import { fetchAllOrders, updateOrderStatus } from "@/services/api";
@@ -100,12 +100,14 @@ const AdminOrders = () => {
     }
   };
 
-  const openWhatsApp = (phone: string, orderId: string, type: 'update' | 'delivery' = 'update') => {
+  const openWhatsApp = (phone: string, orderId: string, type: 'update' | 'delivery' | 'location' = 'update') => {
     if (!phone) return alert("No phone number available");
 
     let text = "";
     if (type === 'update') {
       text = `Hello! Your order #${orderId} from Pozhi Studio is Ready! 📸✨ \nYou can pick it up or we can deliver it.`;
+    } else if (type === 'location') {
+      text = `Hi! This is Pozhi Studio. Your order #${orderId} is finished! 📸 \nPlease share your live location here so we can deliver it to you. You can pay Cash/UPI on delivery. 🙏`;
     } else {
       text = `Hello! Is this a good time to deliver your order #${orderId}? 🚚`;
     }
@@ -316,7 +318,7 @@ const OrderCard = React.forwardRef<HTMLDivElement, {
 const OrderDrawer = ({ order, onClose, openWhatsApp, markDone }: {
   order: AdminUiOrder,
   onClose: () => void,
-  openWhatsApp: (phone: string, id: string, type: 'update' | 'delivery') => void,
+  openWhatsApp: (phone: string, id: string, type: 'update' | 'delivery' | 'location') => void,
   markDone: (id: string, status: string) => void
 }) => {
   return (
@@ -427,20 +429,29 @@ const OrderDrawer = ({ order, onClose, openWhatsApp, markDone }: {
       </div>
 
       {/* Footer Actions */}
-      <div className="p-4 border-t border-gray-100 bg-gray-50/50 flex gap-3">
+      <div className="p-4 border-t border-gray-100 bg-gray-50/50 flex flex-col gap-3">
+        <div className="flex gap-3">
+          <button
+            className="flex-1 py-3 rounded-xl bg-white border border-gray-200 text-gray-700 font-semibold text-xs hover:bg-gray-50 transition-all flex items-center justify-center gap-2"
+            onClick={() => openWhatsApp(order.phone, order.id, 'update')}
+          >
+            <MessageCircle className="w-4 h-4" />
+            Ready Msg
+          </button>
+          <button
+            className="flex-1 py-3 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 font-bold text-xs hover:bg-emerald-100 transition-all flex items-center justify-center gap-2"
+            onClick={() => openWhatsApp(order.phone, order.id, 'location')}
+          >
+            <MapPin className="w-4 h-4" />
+            Req Location
+          </button>
+        </div>
         <button
-          className="flex-1 py-3.5 rounded-xl bg-white border border-gray-200 text-gray-700 font-semibold text-sm hover:bg-gray-50 hover:border-gray-300 transition-all flex items-center justify-center gap-2"
-          onClick={() => openWhatsApp(order.phone, order.id, 'update')}
-        >
-          <MessageCircle className="w-4 h-4" />
-          Update Customer
-        </button>
-        <button
-          className="flex-1 py-3.5 rounded-xl bg-gray-900 text-white font-semibold text-sm hover:bg-gray-800 transition-all flex items-center justify-center gap-2"
+          className="w-full py-3.5 rounded-xl bg-gray-900 text-white font-semibold text-sm hover:bg-gray-800 transition-all flex items-center justify-center gap-2 shadow-lg shadow-gray-900/10"
           onClick={() => openWhatsApp(order.phone, order.id, 'delivery')}
         >
           <Truck className="w-4 h-4" />
-          Deliver
+          Out for Delivery
         </button>
       </div>
     </div>
