@@ -503,7 +503,9 @@ export const loginWithGoogle = async (
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
 
-    const redirectTo = env.GOOGLE_AUTH_REDIRECT_URL || `${env.FRONTEND_URL}/login`;
+    // Allow frontend to specify redirect URL, but fall back to environment defaults
+    const { redirectTo: customRedirect } = req.query;
+    const redirectTo = (customRedirect as string) || env.GOOGLE_AUTH_REDIRECT_URL || `${env.FRONTEND_URL}/login`;
     
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -520,9 +522,12 @@ export const loginWithGoogle = async (
       throw new ApiError(400, error.message);
     }
 
-    // ✅ PERFORM SERVER-SIDE REDIRECT
+    // ✅ RETURN URL AS JSON (Delegates redirect to frontend to avoid CORS)
     if (data.url) {
-      return res.redirect(data.url);
+      return res.status(200).json({
+        status: 'success',
+        data: { url: data.url }
+      });
     }
 
     throw new ApiError(500, 'Failed to generate Google login URL');

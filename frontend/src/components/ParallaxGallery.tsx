@@ -12,13 +12,12 @@ import img9 from "@/assets/parallax/09.jpg";
 import img10 from "@/assets/parallax/10.jpg";
 import img11 from "@/assets/parallax/11.jpg";
 import img12 from "@/assets/parallax/12.jpg";
-import logo from "@/assets/parallax/S N P.png";
 
 const columns = [
   { images: [img1, img2, img3], speed: 35, scale: 1.05, blur: "0px", opacity: 0.8 },
   { images: [img4, img6, img7], speed: 25, scale: 0.95, blur: "1px", opacity: 0.5 },
   { images: [img8, img9, img10], speed: 45, scale: 1.1, blur: "0px", opacity: 0.7 },
-  { images: [img11, img12, logo], speed: 30, scale: 0.9, blur: "2px", opacity: 0.4 },
+  { images: [img11, img12, img1], speed: 30, scale: 0.9, blur: "2px", opacity: 0.4 },
 ];
 
 interface ParallaxGalleryProps {
@@ -34,10 +33,11 @@ const ParallaxGallery = ({ visible, warpSpeed = false }: ParallaxGalleryProps) =
       animate={{ opacity: visible ? 1 : 0, scale: 1 }}
       transition={{ duration: 1.5, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
     >
-      <div className="absolute inset-[-15%] flex gap-6 justify-center items-center">
+      <div className="absolute inset-[-15%] flex gap-4 md:gap-6 justify-center items-center">
         {columns.map((col, colIdx) => (
           <ScrollColumn
             key={colIdx}
+            index={colIdx}
             images={col.images}
             direction={colIdx % 2 === 0 ? "up" : "down"}
             baseSpeed={col.speed}
@@ -76,6 +76,7 @@ interface ScrollColumnProps {
   scale: number;
   blur: string;
   opacity: number;
+  index: number;
 }
 
 const ScrollColumn = ({ 
@@ -85,7 +86,8 @@ const ScrollColumn = ({
   warpSpeed, 
   scale, 
   blur, 
-  opacity 
+  opacity,
+  index
 }: ScrollColumnProps) => {
   const columnRef = useRef<HTMLDivElement>(null);
   const offsetRef = useRef(0);
@@ -126,7 +128,9 @@ const ScrollColumn = ({
 
   return (
     <div 
-      className="relative w-[22vw] max-w-[320px] overflow-hidden h-[130vh] transition-all duration-1000"
+      className={`relative w-[45vw] md:w-[20vw] max-w-[320px] overflow-hidden h-[130vh] transition-all duration-1000 ${
+        index >= 2 ? "hidden md:block" : "block"
+      }`}
       style={{ 
         filter: `blur(${blur})`,
         transform: `scale(${scale})`,

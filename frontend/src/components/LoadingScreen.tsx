@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import PozhiLogo from "./PozhiLogo";
 import albumImg from "@/assets/services/album.jpg";
 
 interface LoadingScreenProps {
@@ -65,25 +64,25 @@ const LoadingScreen = ({ onComplete }: LoadingScreenProps) => {
             }}
           />
 
-          {/* Logo */}
+          {/* POZHI Royal Text Branding */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.85 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            className="z-10"
+            initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
+            className="z-10 text-center"
           >
-            <PozhiLogo size="large" layoutId="pozhi-logo" />
+            <span className="text-foreground text-4xl md:text-6xl font-royal font-black uppercase tracking-[0.4em] mb-2 block">
+              POZHI
+            </span>
+            <motion.span 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.3 }}
+              transition={{ delay: 0.8, duration: 1 }}
+              className="text-[10px] text-foreground font-body font-bold tracking-[0.8em] uppercase block"
+            >
+              The Atelier
+            </motion.span>
           </motion.div>
-
-          {/* Studio label */}
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.6 }}
-            className="text-muted-foreground text-xs tracking-[0.4em] uppercase mt-4 font-body z-10"
-          >
-            Photography Studio
-          </motion.p>
 
           {/* Progress bar */}
           <motion.div

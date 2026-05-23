@@ -2,7 +2,12 @@
 // API SERVICE - Fetch pricing from backend
 // ==========================================
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
+const BACKEND_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
+
+// Smart fix: Ensure the URL ends with /api/v1 for production connectivity
+const API_BASE_URL = BACKEND_URL.endsWith('/api/v1') 
+    ? BACKEND_URL 
+    : `${BACKEND_URL}/api/v1`;
 
 // ==========================================
 // PRICING API
@@ -94,16 +99,7 @@ async function fetchWithCache<T>(
     options: RequestInit = {},
     retries = 2
 ): Promise<T> {
-    // Ensure base URL doesn't end with slash, avoiding double slashes
-    let cleanBaseUrl = API_BASE_URL.replace(/\/$/, '');
-
-    // Smart fix: If URL is in production but missing /api/v1, add it automatically
-    if (cleanBaseUrl.includes('onrender.com') && !cleanBaseUrl.includes('/api/v1')) {
-        cleanBaseUrl = `${cleanBaseUrl}/api/v1`;
-    }
-
-    const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-    const url = `${cleanBaseUrl}${cleanEndpoint}`;
+    const url = `${API_BASE_URL}${endpoint}`;
 
     // Check cache for GET requests
     if (!options.method || options.method === 'GET') {
@@ -206,8 +202,27 @@ export async function fetchAllPricing(): Promise<{
     return await fetchWithCache<any>('/pricing/all');
 }
 
+/**
+ * Update pricing for a specific product variant
+ */
+export async function updatePricing(type: string, id: string, price: number): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/pricing/update`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            ...authHeaders()
+        },
+        body: JSON.stringify({ type, id, price })
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to update price');
+    }
+}
+
 // ==========================================
-// UPLOAD API (Placeholder - To be implemented)
+// UPLOAD API
 // ==========================================
 
 export async function uploadFiles(files: File[]) {
@@ -218,7 +233,8 @@ export async function uploadFiles(files: File[]) {
         method: 'POST',
         body: formData,
         headers: {
-            // Authorization header will be added when auth is implemented
+            // Authorization header
+            ...authHeaders()
         }
     });
 
@@ -230,8 +246,47 @@ export async function uploadFiles(files: File[]) {
 }
 
 // ==========================================
-// ORDERS API (Placeholder - To be implemented)
+// ORDERS API
 // ==========================================
+
+export interface Order {
+    id: string;
+    order_number: string;
+    service_type: string;
+    total_amount: number;
+    payment_status: string;
+    order_status: string;
+    created_at: string;
+    order_items?: {
+        id: string;
+        item_details: any;
+        user_upload_id?: string;
+        user_uploads?: {
+            storage_url: string;
+            original_filename: string;
+        };
+    }[];
+}
+
+export interface AdminStats {
+    today: number;
+    yesterday: number;
+    thisWeek: number;
+    thisMonth: number;
+    thisYear: number;
+    lifetime: number;
+    customRange: {
+        total: number;
+        orderCount: number;
+        active: boolean;
+    };
+    recentOrders: {
+        id: string;
+        service: string;
+        amount: number;
+        createdAt: string;
+    }[];
+}
 
 export async function createOrder(orderData: any) {
     const response = await fetch(`${API_BASE_URL}/orders`, {
@@ -248,6 +303,94 @@ export async function createOrder(orderData: any) {
     }
 
     return await response.json();
+}
+
+export async function fetchUserOrders(): Promise<Order[]> {
+    const response = await fetch(`${API_BASE_URL}/orders`, {
+        headers: authHeaders()
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to fetch orders');
+    }
+
+    const data = await response.json();
+    return data.data; // Backend returns { success: true, data: [...] }
+}
+
+export async function fetchAllOrders(): Promise<Order[]> {
+    const response = await fetch(`${API_BASE_URL}/orders/admin/all`, {
+        headers: authHeaders()
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to fetch admin orders');
+    }
+
+    const data = await response.json();
+    return data.data;
+}
+
+export async function fetchAdminStats(from?: string, to?: string): Promise<AdminStats> {
+    const url = new URL(`${API_BASE_URL}/orders/admin/stats`);
+    if (from) url.searchParams.append('startDate', from);
+    if (to) url.searchParams.append('endDate', to);
+
+    const response = await fetch(url.toString(), {
+        headers: authHeaders()
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to fetch admin stats');
+    }
+
+    const data = await response.json();
+    return data.data;
+}
+
+export async function fetchOrderById(orderId: string): Promise<Order> {
+    const response = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
+        headers: authHeaders()
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to fetch order details');
+    }
+
+    const data = await response.json();
+    return data.data;
+}
+
+/**
+ * Fetch all booked slots for Snap n' Print
+ */
+export async function fetchBookedSlots(month?: number, year?: number): Promise<Record<string, string[]>> {
+    const url = new URL(`${API_BASE_URL}/orders/booked-slots`);
+    if (month) url.searchParams.append('month', month.toString());
+    if (year) url.searchParams.append('year', year.toString());
+
+    const response = await fetch(url.toString());
+    if (!response.ok) {
+        throw new Error('Failed to fetch booked slots');
+    }
+
+    const data = await response.json();
+    return data.data;
+}
+
+export async function updateOrderStatus(id: string, status: string): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/orders/${id}/status`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            ...authHeaders()
+        },
+        body: JSON.stringify({ order_status: status })
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to update order status');
+    }
 }
 
 // ==========================================
@@ -272,6 +415,8 @@ export interface AuthUser {
     email: string;
     full_name: string;
     role: string;
+    phone?: string;
+    avatar_url?: string;
 }
 
 export interface AuthSession {
@@ -294,6 +439,29 @@ export async function login(email: string, password: string): Promise<LoginRespo
 
     const json = await response.json();
     if (!response.ok) throw new Error(json.message || 'Login failed');
+    return json.data;
+}
+
+export async function loginWithGoogle(redirectTo?: string): Promise<{ url: string }> {
+    const url = new URL(`${API_BASE_URL}/auth/google`);
+    if (redirectTo) url.searchParams.append('redirectTo', redirectTo);
+    url.searchParams.append('t', Date.now().toString());
+
+    const response = await fetch(url.toString());
+    const json = await response.json();
+    if (!response.ok) throw new Error(json.message || 'Google login failed');
+    return json.data;
+}
+
+export async function exchangeCodeForGoogleSession(code: string): Promise<LoginResponse> {
+    const response = await fetch(`${API_BASE_URL}/auth/google/exchange`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code }),
+    });
+
+    const json = await response.json();
+    if (!response.ok) throw new Error(json.message || 'OAuth exchange failed');
     return json.data;
 }
 

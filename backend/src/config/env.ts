@@ -40,16 +40,31 @@ const envSchema = z.object({
   WEBAUTHN_RP_ID: z.string().default('localhost'),
   WEBAUTHN_ORIGIN: z.string().default('http://localhost:5173'),
 
-  // Email
+  // Email (Resend or SMTP)
+  EMAIL_PROVIDER: z.enum(['resend', 'smtp', 'mock']).default('smtp'),
   RESEND_API_KEY: z.string().optional(),
-  EMAIL_FROM: z.string().email().optional(),
+  EMAIL_FROM: z.string().default('onboarding@resend.dev'),
+  
+  // SMTP Configuration (Gmail, etc.)
+  SMTP_HOST: z.string().optional(),
+  SMTP_PORT: z.string().optional(),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
+
+  // WhatsApp (Twilio or similar)
+  WHATSAPP_PROVIDER: z.enum(['mock', 'twilio', 'interakt']).default('mock'),
+  WHATSAPP_API_KEY: z.string().optional(),
+  WHATSAPP_API_SECRET: z.string().optional(),
+  WHATSAPP_FROM_NUMBER: z.string().optional(),
+  ADMIN_WHATSAPP_NUMBER: z.string().optional(),
+
   LOG_LEVEL: z.enum(['error', 'warn', 'info', 'debug']).default('info')
 });
 // Validate the environment variables
 const _env = envSchema.safeParse(process.env);
 
 if (!_env.success) {
-  console.error('❌ Invalid environment variables:', JSON.stringify(_env.error.format(), null, 2));
+  console.error('ERROR Invalid environment variables:', JSON.stringify(_env.error.format(), null, 2));
   // Exit process to prevent server from starting in an unstable state
   process.exit(1);
 }
@@ -57,6 +72,7 @@ export const isStripeLiveMode = (): boolean => {
   return env.STRIPE_SECRET_KEY.startsWith('sk_live_');
 };
 
-console.log('✅ Environment variables validated successfully');
+console.log('SUCCESS Environment variables validated successfully');
+console.log('EMAIL_PROVIDER_CHECK: ' + _env.data.EMAIL_PROVIDER);
 
 export const env = _env.data;

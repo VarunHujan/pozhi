@@ -5,9 +5,11 @@ import LoadingScreen from "@/components/LoadingScreen";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import CurtainTransition from "@/components/CurtainTransition";
-import CursorGlow from "@/components/CursorGlow";
+import { useAuth } from "@/contexts/AuthContext";
+import Studio from "./Studio";
 
 const Index = () => {
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [loading, setLoading] = useState(true);
   const [contentVisible, setContentVisible] = useState(false);
   const [transitioning, setTransitioning] = useState(false);
@@ -25,6 +27,14 @@ const Index = () => {
   const handleTransitionComplete = useCallback(() => {
     navigate("/studio");
   }, [navigate]);
+
+  if (authLoading) {
+    return <LoadingScreen onComplete={() => {}} />;
+  }
+
+  if (isAuthenticated) {
+    return <Studio />;
+  }
 
   return (
     <>

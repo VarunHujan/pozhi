@@ -3,11 +3,12 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import ScrollToTop from "@/components/ScrollToTop";
 import SmartBackButton from "@/components/SmartBackButton";
-import { AuthProvider } from "@/contexts/AuthContext";
-import CustomCursor from "./components/ui/CustomCursor";
+import PageTransition from "@/components/PageTransition";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import BottomNav from "@/components/BottomNav";
 
 import Index from "./pages/Index";
 import Studio from "./pages/Studio";
@@ -20,40 +21,51 @@ import Checkout from "./pages/Checkout";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Future from "./pages/Future";
+import Account from "./pages/Account";
 import NotFound from "./pages/NotFound";
-import ThemeLayout from "./components/layout/ThemeLayout";
+import AdminLayout from "./pages/admin/AdminLayout";
+import ThemeLayout from "@/components/layout/ThemeLayout";
 
 const queryClient = new QueryClient();
 
 const AnimatedRoutes = () => {
   const location = useLocation();
-  
+
   return (
     <AnimatePresence mode="wait">
-      <motion.div
-        key={location.pathname}
-        initial={{ opacity: 0, scale: 0.98, filter: "blur(10px)" }}
-        animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-        exit={{ opacity: 0, scale: 1.02, filter: "blur(10px)" }}
-        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      >
-        <Routes location={location}>
-          <Route path="/" element={<Index />} />
-          <Route path="/studio" element={<Studio />} />
-          <Route path="/studio/passphoto" element={<PassPhoto />} />
-          <Route path="/studio/photocopies" element={<PhotoCopies />} />
-          <Route path="/studio/frames" element={<Frames />} />
-          <Route path="/studio/snapnprint" element={<SnapnPrint />} />
-          <Route path="/studio/album" element={<Album />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/future" element={<Future />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </motion.div>
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<Index />} />
+        <Route path="/studio" element={<PageTransition><Studio /></PageTransition>} />
+        <Route path="/studio/passphoto" element={<PageTransition><PassPhoto /></PageTransition>} />
+        <Route path="/studio/photocopies" element={<PageTransition><PhotoCopies /></PageTransition>} />
+        <Route path="/studio/frames" element={<PageTransition><Frames /></PageTransition>} />
+        <Route path="/studio/snapnprint" element={<PageTransition><SnapnPrint /></PageTransition>} />
+        <Route path="/studio/album" element={<PageTransition><Album /></PageTransition>} />
+        <Route path="/checkout" element={<PageTransition><Checkout /></PageTransition>} />
+        <Route path="/about" element={<PageTransition><About /></PageTransition>} />
+        <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
+        <Route path="/future" element={<PageTransition><Future /></PageTransition>} />
+        <Route path="/account" element={<PageTransition><Account /></PageTransition>} />
+        <Route path="/login" element={<PageTransition><Account /></PageTransition>} />
+
+        {/* Admin Routes - The Layout handles sub-routes and protection */}
+        <Route path="/admin/*" element={<AdminLayout />} />
+
+        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
     </AnimatePresence>
   );
+};
+
+const NavigationWrapper = () => {
+  const { isAuthenticated } = useAuth();
+  const location = useLocation();
+  
+  // Show bottom nav only for authenticated users on non-admin routes
+  const showBottomNav = isAuthenticated && !location.pathname.startsWith('/admin');
+  
+  return showBottomNav ? <BottomNav /> : null;
 };
 
 const App = () => (
@@ -65,13 +77,33 @@ const App = () => (
         <BrowserRouter>
           <ScrollToTop />
           <SmartBackButton />
-          <ThemeLayout>
+          <ContentWrapper>
             <AnimatedRoutes />
-          </ThemeLayout>
+          </ContentWrapper>
+          <NavigationWrapper />
         </BrowserRouter>
       </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
+
+const ContentWrapper = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated } = useAuth();
+  const location = useLocation();
+  const isAdmin = location.pathname.startsWith('/admin');
+  const isPortal = isAuthenticated && !isAdmin;
+  
+  if (isAdmin) {
+    return <>{children}</>;
+  }
+
+  return (
+    <ThemeLayout>
+      <div className={isPortal ? "pb-24 md:pb-0" : ""}>
+        {children}
+      </div>
+    </ThemeLayout>
+  );
+};
 
 export default App;

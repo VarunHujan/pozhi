@@ -425,8 +425,12 @@ export async function login(email: string, password: string): Promise<LoginRespo
     return json.data;
 }
 
-export async function loginWithGoogle(): Promise<{ url: string }> {
-    const response = await fetch(`${API_BASE_URL}/auth/google`);
+export async function loginWithGoogle(redirectTo?: string): Promise<{ url: string }> {
+    const url = new URL(`${API_BASE_URL}/auth/google`);
+    if (redirectTo) url.searchParams.append('redirectTo', redirectTo);
+    url.searchParams.append('t', Date.now().toString());
+
+    const response = await fetch(url.toString());
     const json = await response.json();
     if (!response.ok) throw new Error(json.message || 'Google login failed');
     return json.data;

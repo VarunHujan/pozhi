@@ -111,7 +111,9 @@ const Studio = () => {
                   </p>
                </div>
                <div className="flex items-center gap-4">
-                  <span className="text-4xl font-heading italic text-heading">05</span>
+                  <div className="opacity-80 scale-[0.6] -mr-6 -my-4">
+                    <img src="/favicon.ico" alt="Pozhi" className="w-16 h-16 object-contain" />
+                  </div>
                   <p className="lg:hidden text-[11px] font-body font-bold text-foreground/40 uppercase tracking-[0.1em]">
                     Core Services
                   </p>

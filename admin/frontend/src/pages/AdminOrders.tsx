@@ -112,7 +112,12 @@ const AdminOrders = () => {
       text = `Hello! Is this a good time to deliver your order #${orderId}? 🚚`;
     }
 
-    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, "_blank");
+    let cleanPhone = phone.replace(/\D/g, "");
+    if (cleanPhone.length === 10) {
+      cleanPhone = `91${cleanPhone}`;
+    }
+
+    window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`, "_blank");
   };
 
   // Filter orders based on tab

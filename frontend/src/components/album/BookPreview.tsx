@@ -1,6 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
 import type { CoverType } from "@/pages/Album";
-import pozhiLogo from "@/assets/pozhi-logo.jpg";
 
 interface BookPreviewProps {
   isFlipped: boolean;
@@ -81,11 +80,12 @@ const BookPreview = ({
                   {/* Editorial Trim */}
                   <div className="absolute inset-5 border-[1.5px] border-foreground/[0.03] rounded-sm" />
                   
-                  <img
-                    src={pozhiLogo}
-                    alt="Pozhi"
-                    className="w-16 h-16 object-contain grayscale opacity-20 mb-10"
-                  />
+                  {/* Minimal Text Branding */}
+                  <div className="mb-10 opacity-20">
+                    <span className="text-foreground text-sm font-heading font-black tracking-[0.4em] uppercase">
+                      POZHI
+                    </span>
+                  </div>
                   
                   <div className="text-center relative z-10">
                     <h4 className="text-sm font-heading font-black text-heading tracking-tight mb-2 uppercase">

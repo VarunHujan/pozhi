@@ -21,7 +21,7 @@ interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
-  loginWithGoogle: () => Promise<string>;
+  loginWithGoogle: (redirectTo?: string) => Promise<string>;
   completeGoogleLogin: (code: string) => Promise<void>;
   completeGoogleLoginWithHash: (hash: string) => Promise<void>;
   loginWithPasskey: (email?: string) => Promise<void>;
@@ -167,13 +167,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(loggedInUser);
   }, []);
 
-  const loginWithGoogle = useCallback(async () => {
-    const { url } = await import('@/services/api').then(api => api.loginWithGoogle());
+  const loginWithGoogle = useCallback(async (redirectTo?: string) => {
+    const { url } = await import('@/services/api').then(api => api.loginWithGoogle(redirectTo));
     return url; // Return the URL so the UI can handle the redirect
   }, []);
 
   const completeGoogleLogin = useCallback(async (code: string) => {
     const { user: loggedInUser, session } = await import('@/services/api').then(api => api.exchangeCodeForGoogleSession(code));
+    
+    if (loggedInUser.role !== 'admin') {
+      throw new Error("Admin access required.");
+    }
+
     storeSession(session);
     setUser(loggedInUser);
   }, []);

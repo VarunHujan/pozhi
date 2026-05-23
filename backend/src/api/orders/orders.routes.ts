@@ -4,7 +4,7 @@
 
 import { Router } from 'express';
 import * as OrderController from './orders.controller';
-import { requireAuth } from '../../middleware/auth.middleware';
+import { requireAuth, optionalAuth, requireAdmin } from '../../middleware/auth.middleware';
 import { createRateLimiter } from '../../middleware/rateLimiter.middleware';
 import { validate } from '../../middleware/validate';
 import { createOrderSchema, updateOrderStatusSchema } from './orders.validation';
@@ -44,6 +44,7 @@ const orderViewLimiter = createRateLimiter({
 /**
  * Create new order
  * POST /api/v1/orders
+ * ✅ ENFORCED LOGIN: requireAuth instead of optionalAuth
  */
 router.post(
   '/',
@@ -65,12 +66,22 @@ router.get(
 );
 
 /**
+ * Get Booked Slots for Snap n' Print
+ * GET /api/v1/orders/booked-slots
+ */
+router.get(
+  '/booked-slots',
+  OrderController.getBookedSlots
+);
+
+/**
  * Get Income Stats (Admin)
  * GET /api/v1/orders/admin/stats
  */
 router.get(
   '/admin/stats',
   requireAuth,
+  requireAdmin,
   OrderController.getAdminStats
 );
 
@@ -81,6 +92,7 @@ router.get(
 router.get(
   '/admin/all',
   requireAuth,
+  requireAdmin,
   // rate limiter shared with view
   OrderController.getAllOrders
 );
@@ -114,6 +126,7 @@ router.post(
 router.patch(
   '/:id/status',
   requireAuth,
+  requireAdmin,
   validate(updateOrderStatusSchema), // ✅ Validation added
   OrderController.updateOrderStatus
 );

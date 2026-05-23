@@ -18,20 +18,20 @@ export const logger = winston.createLogger({
   },
   transports: [
     // Error logs
-    // new winston.transports.DailyRotateFile({
-    //   filename: 'logs/error-%DATE%.log',
-    //   datePattern: 'YYYY-MM-DD',
-    //   level: 'error',
-    //   maxSize: '20m',
-    //   maxFiles: '30d'
-    // }),
+    new winston.transports.DailyRotateFile({
+      filename: 'logs/error-%DATE%.log',
+      datePattern: 'YYYY-MM-DD',
+      level: 'error',
+      maxSize: '20m',
+      maxFiles: '30d'
+    }),
     // Combined logs
-    // new winston.transports.DailyRotateFile({
-    //   filename: 'logs/combined-%DATE%.log',
-    //   datePattern: 'YYYY-MM-DD',
-    //   maxSize: '20m',
-    //   maxFiles: '14d'
-    // }),
+    new winston.transports.DailyRotateFile({
+      filename: 'logs/combined-%DATE%.log',
+      datePattern: 'YYYY-MM-DD',
+      maxSize: '20m',
+      maxFiles: '14d'
+    }),
     // Console (development only)
     ...(env.NODE_ENV !== 'production'
       ? [new winston.transports.Console({

@@ -35,75 +35,43 @@ const HeroSection = ({ visible, onEnterStudio }: HeroSectionProps) => {
           transform: "translate(-50%, -50%)",
         }}
       />
-
       {/* Typography overlay — Clean Editorial without milky blur */}
-      <div className="relative z-10 text-center px-6 pointer-events-none py-12">
-        {/* Eyebrow label */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={visible ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 1.2, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <div className="flex items-center justify-center gap-4 mb-6 md:mb-10">
-            <div className="h-px w-6 md:w-8 bg-foreground/10" />
-            <p className="text-[9px] md:text-[10px] font-body font-bold text-muted-foreground/60 tracking-[0.5em] md:tracking-[0.6em] uppercase">
-                EST. 2020 · POZHI STUDIO
-            </p>
-            <div className="h-px w-6 md:w-8 bg-foreground/10" />
-          </div>
-        </motion.div>
-
-        {/* Main headline — Serif Playfair Display */}
-        <div className="overflow-hidden mb-2">
-          <motion.h1
-            initial={{ y: "100%", opacity: 0 }}
-            animate={visible ? { y: 0, opacity: 1 } : {}}
-            transition={{ duration: 1.4, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className="text-[clamp(3rem,10vw,7rem)] font-heading font-black text-heading leading-[0.85] tracking-tight"
-          >
-            FRAMING
-          </motion.h1>
+      <div className="relative z-20 text-center px-6 pointer-events-none py-12 flex flex-col items-center">
+        {/* Brand Logo Anchor */}
+        <div className="mb-12 opacity-100 scale-110">
         </div>
 
-        {/* Animated cycling word */}
-        <div className="overflow-hidden mb-12">
-          <motion.div
-            initial={{ y: "100%", opacity: 0 }}
-            animate={visible ? { y: 0, opacity: 1 } : {}}
-            transition={{ duration: 1.4, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="text-[clamp(3rem,10vw,7rem)] font-heading italic text-heading leading-[0.85] tracking-tight"
-          >
-            <AnimatedText visible={visible} />
-          </motion.div>
-        </div>
+        {/* Eyebrow label removed for extreme minimalism */}
+
+        {/* Eyebrow label removed for extreme minimalism */}
 
         {/* Subtext — Fine refined serif */}
         <motion.p
           initial={{ opacity: 0, filter: "blur(10px)" }}
           animate={visible ? { opacity: 1, filter: "blur(0px)" } : {}}
-          transition={{ duration: 1.5, delay: 1, ease: "easeOut" }}
-          className="text-xs md:text-sm text-foreground/40 max-w-sm mx-auto mb-12 md:mb-20 leading-[1.8] font-body uppercase tracking-[0.25em]"
+          transition={{ duration: 1.5, delay: 0.6, ease: "easeOut" }}
+          className="text-xs md:text-sm text-foreground/40 max-w-sm mx-auto mb-10 md:mb-12 leading-[1.8] font-body uppercase tracking-[0.25em]"
         >
           An archival dedicated photography atelier crafting timeless yields with precision and soul.
         </motion.p>
       </div>
 
-      {/* CTA Button — Premium but NO MOUSE EFFECTS */}
+      {/* CTA Button — Solid Premium */}
       <motion.div
         className="relative z-20 pointer-events-auto"
         initial={{ opacity: 0, scale: 0.9 }}
         animate={visible ? { opacity: 1, scale: 1 } : {}}
         transition={{ duration: 1, delay: 1.4, ease: [0.22, 1, 0.36, 1] }}
       >
-        <button 
-           onClick={handleEnterStudio}
-           className="relative group px-12 py-6 rounded-full border border-foreground/5 bg-white/5 hover:bg-foreground hover:text-background transition-all duration-700 overflow-hidden cursor-pointer glass-pro shadow-2xl shadow-black/5"
+        <button
+          onClick={handleEnterStudio}
+          className="relative group px-12 py-6 rounded-full bg-foreground text-background hover:scale-105 transition-all duration-500 overflow-hidden cursor-pointer shadow-2xl shadow-black/20"
         >
-            <div className="absolute inset-x-0 h-px top-0 bg-gradient-to-r from-transparent via-foreground/10 to-transparent group-hover:via-background/50 transition-all" />
-            <span className="relative z-10 text-[10px] font-body font-black tracking-[0.4em] uppercase flex items-center gap-3">
-                <Play className="w-3.5 h-3.5 fill-current" />
-                Initialize Studio
-            </span>
+          <div className="absolute inset-x-0 h-px top-0 bg-gradient-to-r from-transparent via-background/20 to-transparent group-hover:via-background/50 transition-all" />
+          <span className="relative z-10 text-[10px] font-body font-black tracking-[0.4em] uppercase flex items-center gap-3">
+            <Play className="w-3.5 h-3.5 fill-current" />
+            Initialize Studio
+          </span>
         </button>
       </motion.div>
 

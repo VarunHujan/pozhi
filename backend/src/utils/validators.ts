@@ -1,4 +1,6 @@
 
+import crypto from 'crypto';
+
 export function validateUUID(uuid: string): boolean {
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   return uuidRegex.test(uuid);
@@ -136,7 +138,6 @@ export function validateFileUpload(file: {
  * Generate secure random token
  */
 export function generateSecureToken(length = 32): string {
-  const crypto = require('crypto');
   return crypto.randomBytes(length).toString('hex');
 }
 
@@ -144,7 +145,6 @@ export function generateSecureToken(length = 32): string {
  * Hash password (for comparison, not storage - use Supabase Auth)
  */
 export function hashPassword(password: string): string {
-  const crypto = require('crypto');
   return crypto
     .createHash('sha256')
     .update(password)

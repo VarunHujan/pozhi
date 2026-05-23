@@ -14,9 +14,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["Space Grotesk", "sans-serif"],
-        display: ["Archivo", "sans-serif"],
-        body: ["Space Grotesk", "sans-serif"],
+        sans: ["Roboto", "sans-serif"],
+        display: ["Roboto", "sans-serif"],
+        body: ["Roboto", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -25,11 +25,8 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         surface: "hsl(var(--surface))",
-        "surface-2": "hsl(var(--surface-2))",
         heading: "hsl(var(--heading))",
         body: "hsl(var(--body))",
-        gold: "hsl(var(--gold))",
-        silver: "hsl(var(--silver))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",

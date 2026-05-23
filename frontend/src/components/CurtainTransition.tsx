@@ -46,7 +46,7 @@ const CurtainTransition = ({ isActive, onComplete }: CurtainTransitionProps) => 
           times: [0, 0.32, 0.68, 1],
         }}
       >
-        <span className="text-foreground/90 text-xl md:text-3xl font-heading font-black tracking-[0.61em] uppercase">
+        <span className="text-foreground/90 text-2xl md:text-5xl font-royal font-black tracking-[0.5em] uppercase">
           POZHI
         </span>
       </motion.div>
