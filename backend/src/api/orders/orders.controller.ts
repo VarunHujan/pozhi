@@ -68,7 +68,7 @@ export const createOrder = async (
     // SECURE PRICE VERIFICATION (NEVER TRUST FRONTEND)
     // ==========================================
     let subtotal = 0;
-    const processedOrderItems = [];
+    const processedOrderItems: any[] = [];
 
     for (const item of items) {
       let unitPrice = 0;

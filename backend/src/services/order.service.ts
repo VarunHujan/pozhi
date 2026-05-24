@@ -406,7 +406,7 @@ export const orderService = {
   async calculateCustomizationPrice(customizations: any): Promise<number> {
     let totalPrice = 0;
 
-    const options = [];
+    const options: any[] = [];
     if (customizations.mat_color) options.push(customizations.mat_color);
     if (customizations.glass_type) options.push(customizations.glass_type);
     if (customizations.finish) options.push(customizations.finish);

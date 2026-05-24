@@ -42,7 +42,7 @@ export const uploadFiles = async (
     }
 
     // Check if files exist (multer middleware should handle this)
-    const files = req.files as Express.Multer.File[];
+    const files = req.files as any[];
     if (!files || files.length === 0) {
       throw new ApiError(400, 'No files uploaded');
     }
@@ -53,7 +53,7 @@ export const uploadFiles = async (
       sizes: files.map(f => f.size)
     });
 
-    const uploads = [];
+    const uploads: any[] = [];
 
     // SMART LOGIC: Determine storage provider
     let storageProvider: 'supabase' | 'cloudflare_r2';
@@ -250,7 +250,7 @@ export const deleteUpload = async (
 /**
  * Upload file to Supabase Storage
  */
-async function uploadToSupabase(file: Express.Multer.File, userId: string) {
+async function uploadToSupabase(file: any, userId: string) {
   const sanitizedFilename = `${Date.now()}-${file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
   const filePath = `${userId}/${sanitizedFilename}`;
 
@@ -291,7 +291,7 @@ async function uploadToSupabase(file: Express.Multer.File, userId: string) {
 /**
  * Upload file to Cloudflare R2
  */
-async function uploadToCloudflareR2(file: Express.Multer.File, userId: string) {
+async function uploadToCloudflareR2(file: any, userId: string) {
   const sanitizedFilename = `${Date.now()}-${file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
   const filePath = `${userId}/${sanitizedFilename}`;
 
