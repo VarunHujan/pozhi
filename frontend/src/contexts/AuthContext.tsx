@@ -148,24 +148,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     storeSession(session);
     setUser(loggedInUser);
   }, []);
-
-  const loginWithGoogle = useCallback(async (redirectTo?: string) => {
-    // We initiate the OAuth flow from the frontend so that Supabase can set the
-    // required state/PKCE cookies in the browser. This fixes "bad_oauth_state".
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: redirectTo || `${window.location.origin}/account`,
-        queryParams: {
-          access_type: 'offline',
-          prompt: 'consent',
-        },
+const loginWithGoogle = useCallback(async (redirectTo?: string) => {
+  // We initiate the OAuth flow from the frontend so that Supabase can set the
+  // required state/PKCE cookies in the browser. This fixes "bad_oauth_state"
+  // and avoids the backend's hardcoded localhost:3000 redirect defaults.
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: redirectTo || `${window.location.origin}/account`,
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'consent',
       },
-    });
+    },
+  });
 
-    if (error) throw error;
-    return data.url || '';
-  }, []);
+  if (error) throw error;
+  return data.url || '';
+}, []);
 
   const completeGoogleLogin = useCallback(async (code: string) => {
     const { user: loggedInUser, session } = await apiExchangeCodeForGoogleSession(code);
