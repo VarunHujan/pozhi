@@ -153,145 +153,189 @@ const Account = () => {
         className="min-h-screen pt-24 pb-32 px-4 md:px-8 flex justify-center bg-[#F8F9FA]"
       >
         <div className="w-full max-w-5xl">
-            
-            {currentTab === "updates" ? (
-                /* Profile View */
-                <div className="flex flex-col md:flex-row gap-8">
-                    {/* Sidebar / Profile Card */}
-                    <div className="w-full md:w-80 shrink-0">
-                        <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6 sticky top-28">
-                            <div className="flex flex-col items-center text-center space-y-4">
-                                <div className="w-24 h-24 bg-primary/5 border border-primary/10 rounded-full flex items-center justify-center shadow-inner overflow-hidden">
-                                    {user?.avatar_url ? (
-                                        <img src={user.avatar_url} alt="Profile" className="w-full h-full object-cover" />
-                                    ) : (
-                                        <User className="w-10 h-10 text-primary" />
-                                    )}
-                                </div>
-                                <div>
-                                    <h2 className="text-xl font-bold text-gray-900">{user?.full_name || "User"}</h2>
-                                    <p className="text-sm text-gray-500">{user?.email}</p>
-                                </div>
-                                
-                                <div className="w-full pt-6 border-t border-gray-100">
-                                    <motion.button
-                                        whileHover={{ scale: 1.02 }}
-                                        whileTap={{ scale: 0.98 }}
-                                        onClick={logout}
-                                        className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-gray-50 text-gray-700 font-medium rounded-xl hover:bg-gray-100 transition-colors"
-                                    >
-                                        <LogOut className="w-4 h-4" />
-                                        Sign Out
-                                    </motion.button>
-                                </div>
+            <div className="flex flex-col md:flex-row gap-8">
+                {/* Sidebar / Profile Card - Always visible on PC */}
+                <div className="w-full md:w-80 shrink-0">
+                    <div className="bg-white border border-gray-100 rounded-3xl shadow-sm p-6 sticky top-28">
+                        <div className="flex flex-col items-center text-center space-y-4">
+                            <div className="w-24 h-24 bg-primary/5 border border-primary/10 rounded-full flex items-center justify-center shadow-inner overflow-hidden">
+                                {user?.avatar_url ? (
+                                    <img src={user.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                                ) : (
+                                    <User className="w-10 h-10 text-primary" />
+                                )}
                             </div>
-                        </div>
-                    </div>
-
-                    {/* Profile Details Area */}
-                    <div className="flex-1 space-y-6">
-                        <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6">
-                             <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                                <Bell className="w-5 h-5 text-primary" />
-                                Latest Updates
-                            </h3>
+                            <div className="pb-2">
+                                <h2 className="text-xl font-bold text-gray-900 leading-tight">{user?.full_name || "User"}</h2>
+                                <p className="text-sm text-gray-500 mt-1">{user?.email}</p>
+                            </div>
                             
-                            <div className="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-gray-200 before:to-transparent">
-                                <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                                    <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-green-100 text-green-600 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
-                                        <Bell className="w-4 h-4" />
-                                    </div>
-                                    <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl border border-gray-100 bg-white shadow-sm">
-                                        <div className="flex items-center justify-between space-x-2 mb-1">
-                                            <div className="font-bold text-gray-900">Welcome to Pozhi!</div>
-                                            <time className="font-mono text-xs font-medium text-primary">Now</time>
-                                        </div>
-                                        <div className="text-sm text-gray-500">
-                                            Our new digital storefront is officially live.
-                                        </div>
-                                    </div>
-                                </div>
+                            {/* Navigation Tabs (Sidebar version for PC) */}
+                            <div className="w-full pt-2 space-y-1">
+                                <button 
+                                    onClick={() => setSearchParams({ tab: "orders" })}
+                                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition-all ${currentTab === "orders" ? "bg-primary text-white font-bold shadow-lg shadow-primary/20" : "text-gray-600 hover:bg-gray-50 font-medium"}`}
+                                >
+                                    <Package className={`w-4 h-4 ${currentTab === "orders" ? "text-white" : "text-gray-400"}`} />
+                                    Order History
+                                </button>
+                                <button 
+                                    onClick={() => setSearchParams({ tab: "updates" })}
+                                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition-all ${currentTab === "updates" ? "bg-primary text-white font-bold shadow-lg shadow-primary/20" : "text-gray-600 hover:bg-gray-50 font-medium"}`}
+                                >
+                                    <Bell className={`w-4 h-4 ${currentTab === "updates" ? "text-white" : "text-gray-400"}`} />
+                                    Latest Updates
+                                </button>
                             </div>
-                        </div>
 
-                        <div className="bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/10 rounded-2xl p-6 text-center">
-                            <h4 className="font-bold text-gray-900 mb-2">Need Help?</h4>
-                            <p className="text-sm text-gray-600 mb-4">Our support team is available to assist you.</p>
+                            <div className="w-full pt-6 border-t border-gray-100">
+                                <motion.button
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    onClick={logout}
+                                    className="w-full flex items-center justify-center gap-2 py-3.5 px-4 bg-gray-50 text-gray-700 font-bold rounded-2xl hover:bg-red-50 hover:text-red-600 transition-colors"
+                                >
+                                    <LogOut className="w-4 h-4" />
+                                    Sign Out
+                                </motion.button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            ) : (
-                /* Orders View */
-                <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6 md:p-8">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-3">
-                        <Package className="w-6 h-6 text-primary" />
-                        Your Order History
-                    </h3>
 
-                    {loadingOrders ? (
-                        <div className="py-12 flex flex-col items-center justify-center text-gray-400">
-                            <Loader2 className="w-8 h-8 animate-spin mb-4" />
-                            <p>Loading your orders...</p>
-                        </div>
-                    ) : orders.length === 0 ? (
-                        <div className="py-16 flex flex-col items-center justify-center text-center">
-                            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
-                                <Package className="w-10 h-10 text-gray-300" />
-                            </div>
-                            <h4 className="text-xl font-semibold text-gray-900">No orders yet</h4>
-                            <p className="text-sm text-gray-500 mt-2 max-w-sm">
-                                You haven't placed any orders with us yet. Head over to our studio to get started!
-                            </p>
-                            <motion.button
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={() => navigate('/studio')}
-                                className="mt-8 px-8 py-3 bg-primary text-white font-bold rounded-xl shadow-md"
-                            >
-                                Browse Studio
-                            </motion.button>
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-1 gap-6">
-                            {orders.map((order) => (
-                                <div key={order.id} className="border border-gray-100 rounded-2xl p-6 hover:shadow-lg transition-all group bg-gray-50/50">
-                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                                        <div>
-                                            <p className="text-xs font-bold text-primary font-mono bg-primary/5 px-2.5 py-1 rounded-full inline-block mb-3 tracking-wider">
-                                                #{order.order_number}
-                                            </p>
-                                            <h4 className="text-xl font-bold text-gray-900">{order.service_type}</h4>
+                {/* Main Content Area */}
+                <div className="flex-1 min-w-0">
+                    {currentTab === "updates" ? (
+                        /* Updates View */
+                        <div className="space-y-6">
+                            <div className="bg-white border border-gray-100 rounded-3xl shadow-sm p-6 md:p-8">
+                                <h3 className="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-3">
+                                    <Bell className="w-6 h-6 text-primary" />
+                                    Latest Updates
+                                </h3>
+                                
+                                <div className="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-gray-200 before:to-transparent">
+                                    <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                                        <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-green-100 text-green-600 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
+                                            <Bell className="w-4 h-4" />
                                         </div>
-                                        <div className="flex flex-row sm:flex-col items-center sm:items-end gap-3">
-                                            <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border ${getStatusColor(order.order_status)}`}>
-                                                {order.order_status}
-                                            </span>
-                                            <span className="text-2xl font-black text-gray-900 tabular-nums tracking-tight">
-                                                ₹{order.total_amount}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    
-                                    <div className="flex flex-wrap gap-6 text-sm text-gray-500 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-                                        <div className="flex items-center gap-2 font-medium">
-                                            <Calendar className="w-4 h-4 text-primary/40" />
-                                            {format(new Date(order.created_at), 'PPP')}
-                                        </div>
-                                        <div className="flex items-center gap-2 font-medium">
-                                            <CreditCard className="w-4 h-4 text-primary/40" />
-                                            <span className="capitalize">{order.payment_status}</span>
-                                        </div>
-                                        <div className="flex items-center gap-2 font-medium">
-                                            <Activity className="w-4 h-4 text-primary/40" />
-                                            {order.order_items?.length || 0} Professional Item(s)
+                                        <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-5 rounded-2xl border border-gray-100 bg-white shadow-sm">
+                                            <div className="flex items-center justify-between space-x-2 mb-1">
+                                                <div className="font-bold text-gray-900">Welcome to Pozhi!</div>
+                                                <time className="font-mono text-xs font-medium text-primary">Now</time>
+                                            </div>
+                                            <div className="text-sm text-gray-500">
+                                                Our new digital storefront is officially live. Explore our services and place your first order.
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            ))}
+                            </div>
+
+                            <div className="bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/10 rounded-3xl p-8 text-center">
+                                <h4 className="font-bold text-gray-900 mb-2">Need Assistance?</h4>
+                                <p className="text-sm text-gray-600 mb-6">Our professional support team is ready to help you with your designs.</p>
+                                <button 
+                                    onClick={() => navigate('/contact')}
+                                    className="px-8 py-3 bg-white text-primary font-bold rounded-xl border border-primary/10 hover:shadow-md transition-all"
+                                >
+                                    Contact Support
+                                </button>
+                            </div>
+                        </div>
+                    ) : (
+                        /* Orders View */
+                        <div className="bg-white border border-gray-100 rounded-3xl shadow-sm p-6 md:p-8">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                                <h3 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+                                    <Package className="w-6 h-6 text-primary" />
+                                    Your Order History
+                                </h3>
+                                {orders.length > 0 && (
+                                    <span className="px-4 py-1.5 bg-gray-50 text-gray-500 text-xs font-bold rounded-full border border-gray-100">
+                                        {orders.length} Total Orders
+                                    </span>
+                                )}
+                            </div>
+
+                            {loadingOrders ? (
+                                <div className="py-20 flex flex-col items-center justify-center text-gray-400">
+                                    <Loader2 className="w-8 h-8 animate-spin mb-4 text-primary" />
+                                    <p className="font-medium">Syncing your orders...</p>
+                                </div>
+                            ) : orders.length === 0 ? (
+                                <div className="py-20 flex flex-col items-center justify-center text-center">
+                                    <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-6">
+                                        <Package className="w-12 h-12 text-gray-300" />
+                                    </div>
+                                    <h4 className="text-xl font-bold text-gray-900">No orders found</h4>
+                                    <p className="text-sm text-gray-500 mt-2 max-w-xs mx-auto">
+                                        You haven't placed any orders yet. Visit our studio to start your first project!
+                                    </p>
+                                    <motion.button
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        onClick={() => navigate('/studio')}
+                                        className="mt-8 px-10 py-4 bg-primary text-white font-bold rounded-2xl shadow-lg shadow-primary/25 hover:bg-primary/90 transition-all"
+                                    >
+                                        Browse Our Studio
+                                    </motion.button>
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-1 gap-6">
+                                    {orders.map((order) => (
+                                        <div key={order.id} className="border border-gray-100 rounded-3xl p-6 hover:shadow-xl hover:shadow-gray-200/50 transition-all group bg-gray-50/30">
+                                            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+                                                <div>
+                                                    <div className="flex items-center gap-3 mb-3">
+                                                        <p className="text-[10px] font-black text-primary font-mono bg-primary/10 px-3 py-1 rounded-full tracking-wider">
+                                                            #{order.order_number}
+                                                        </p>
+                                                        <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border shadow-sm ${getStatusColor(order.order_status)}`}>
+                                                            {order.order_status}
+                                                        </span>
+                                                    </div>
+                                                    <h4 className="text-2xl font-black text-gray-900 tracking-tight">{order.service_type}</h4>
+                                                </div>
+                                                <div className="flex items-end flex-col">
+                                                    <span className="text-3xl font-black text-gray-900 tabular-nums tracking-tighter">
+                                                        ₹{order.total_amount}
+                                                    </span>
+                                                    <div className="flex items-center gap-1.5 text-xs font-bold text-gray-400 mt-1">
+                                                        <CreditCard className="w-3.5 h-3.5" />
+                                                        <span className="capitalize">{order.payment_status}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
+                                                <div className="flex items-center gap-3 bg-white p-3.5 rounded-2xl border border-gray-100 shadow-sm">
+                                                    <div className="w-8 h-8 rounded-full bg-primary/5 flex items-center justify-center">
+                                                        <Calendar className="w-4 h-4 text-primary" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Placed On</p>
+                                                        <p className="text-sm font-bold text-gray-700">{format(new Date(order.created_at), 'PPP')}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-3 bg-white p-3.5 rounded-2xl border border-gray-100 shadow-sm">
+                                                    <div className="w-8 h-8 rounded-full bg-primary/5 flex items-center justify-center">
+                                                        <Activity className="w-4 h-4 text-primary" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Items</p>
+                                                        <p className="text-sm font-bold text-gray-700">{order.order_items?.length || 0} Professional Service(s)</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
-            )}
+            </div>
         </div>
       </motion.main>
     </>

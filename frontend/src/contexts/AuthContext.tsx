@@ -8,6 +8,8 @@ import {
   refreshToken as apiRefreshToken,
   getPasskeyLoginOptions,
   verifyPasskeyLogin,
+  loginWithGoogle as apiLoginWithGoogle,
+  exchangeCodeForGoogleSession as apiExchangeCodeForGoogleSession,
   type AuthUser,
   type AuthSession,
 } from '@/services/api';
@@ -147,12 +149,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const loginWithGoogle = useCallback(async (redirectTo?: string) => {
-    const { url } = await import('@/services/api').then(api => api.loginWithGoogle(redirectTo));
+    const { url } = await apiLoginWithGoogle(redirectTo);
     return url;
   }, []);
 
   const completeGoogleLogin = useCallback(async (code: string) => {
-    const { user: loggedInUser, session } = await import('@/services/api').then(api => api.exchangeCodeForGoogleSession(code));
+    const { user: loggedInUser, session } = await apiExchangeCodeForGoogleSession(code);
     storeSession(session);
     setUser(loggedInUser);
   }, []);

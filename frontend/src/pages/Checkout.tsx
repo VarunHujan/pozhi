@@ -9,6 +9,7 @@ import SuccessScreen from "@/components/checkout/SuccessScreen";
 import FailureScreen from "@/components/checkout/FailureScreen";
 import type { CheckoutState } from "@/lib/checkout-types";
 import { useAuth } from "@/contexts/AuthContext";
+import { createOrder } from "@/services/api";
 
 const GIFT_WRAP_PRICE = 30;
 
@@ -82,9 +83,6 @@ const Checkout = () => {
     setStatus("processing");
     
     try {
-      // Import API service
-      const { createOrder } = await import("@/services/api");
-      
       // Prepare items for backend
       const items = [{
         service_type: orderState.service,
