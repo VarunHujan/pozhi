@@ -176,7 +176,7 @@ const loginWithGoogle = useCallback(async (redirectTo?: string) => {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: redirectTo || `${window.location.origin}/account`,
+      redirectTo: redirectTo || `${window.location.origin}/login`,
       queryParams: {
         access_type: 'offline',
         prompt: 'consent',

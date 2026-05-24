@@ -29,6 +29,8 @@ const Account = () => {
     if (hash && hash.includes("access_token")) {
       completeGoogleLoginWithHash(hash)
         .then(() => {
+          // Check if user is admin and redirect
+          // We'll let the other useEffect handle the actual redirection
           navigate("/account");
         })
         .catch((err: any) => {
@@ -48,7 +50,20 @@ const Account = () => {
     if (errorParam) {
       setError(decodeURIComponent(errorParam));
     }
-  }, [completeGoogleLogin, completeGoogleLoginWithHash, navigate]);
+  }, [completeGoogleLogin, completeGoogleLoginWithHash, navigate, searchParams]);
+
+  // Redirect admin users to the admin portal
+  useEffect(() => {
+    if (isAuthenticated && user?.role === 'admin') {
+      const adminUrl = window.location.hostname.includes('admin') 
+        ? window.location.origin 
+        : 'https://admin.pozhi.in';
+      
+      if (!window.location.hostname.includes('admin')) {
+        window.location.href = `${adminUrl}/login${window.location.hash}`;
+      }
+    }
+  }, [isAuthenticated, user]);
 
   useEffect(() => {
     if (isAuthenticated && user) {

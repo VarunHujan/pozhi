@@ -33,14 +33,14 @@ const LoadingScreen = ({ onComplete }: LoadingScreenProps) => {
       {phase !== "exit" && (
         <motion.div
           key="loading"
-          className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-background overflow-hidden"
+          className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-[#0a192f] overflow-hidden"
           exit={{ opacity: 0 }}
           transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
         >
           {/* Background Image — UI/UX Pro Max: Ken Burns Effect */}
           <motion.div 
             initial={{ scale: 1.1, opacity: 0 }}
-            animate={{ scale: 1, opacity: 0.12 }}
+            animate={{ scale: 1, opacity: 0.1 }}
             transition={{ duration: 3, ease: "easeOut" }}
             className="absolute inset-0 z-0"
           >
@@ -51,13 +51,13 @@ const LoadingScreen = ({ onComplete }: LoadingScreenProps) => {
             />
           </motion.div>
 
-          <div className="absolute inset-0 bg-background/60 backdrop-blur-[2px] z-[1] grain-overlay" />
+          <div className="absolute inset-0 bg-[#0a192f]/40 backdrop-blur-[2px] z-[1] grain-overlay" />
 
           {/* Ambient orb */}
           <div
             className="absolute w-[600px] h-[600px] orb animate-pulse-glow z-[2]"
             style={{
-              background: "radial-gradient(circle, rgba(230,220,200,0.1) 0%, transparent 70%)",
+              background: "radial-gradient(circle, rgba(100,180,255,0.08) 0%, transparent 70%)",
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
@@ -71,14 +71,14 @@ const LoadingScreen = ({ onComplete }: LoadingScreenProps) => {
             transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
             className="z-10 text-center"
           >
-            <span className="text-foreground text-4xl md:text-6xl font-royal font-black uppercase tracking-[0.4em] mb-2 block">
+            <span className="text-white text-4xl md:text-6xl font-royal font-black uppercase tracking-[0.4em] mb-2 block">
               POZHI
             </span>
             <motion.span 
               initial={{ opacity: 0 }}
-              animate={{ opacity: 0.3 }}
+              animate={{ opacity: 0.4 }}
               transition={{ delay: 0.8, duration: 1 }}
-              className="text-[10px] text-foreground font-body font-bold tracking-[0.8em] uppercase block"
+              className="text-[10px] text-white font-body font-bold tracking-[0.8em] uppercase block"
             >
               The Atelier
             </motion.span>
@@ -86,20 +86,20 @@ const LoadingScreen = ({ onComplete }: LoadingScreenProps) => {
 
           {/* Progress bar */}
           <motion.div
-            className="absolute bottom-12 left-1/2 -translate-x-1/2 w-40 h-px bg-muted overflow-hidden z-10"
+            className="absolute bottom-12 left-1/2 -translate-x-1/2 w-40 h-px bg-white/10 overflow-hidden z-10"
             initial={{ opacity: 0 }}
             animate={{ opacity: [0, 1, 1, 0] }}
             transition={{ duration: 2, times: [0, 0.1, 0.8, 1] }}
           >
             <motion.div
-              className="h-full bg-foreground/80 rounded-full origin-left"
+              className="h-full bg-white/80 rounded-full origin-left"
               style={{ width: `${progress}%` }}
             />
           </motion.div>
 
           {/* Progress number */}
           <motion.span
-            className="absolute bottom-[4.2rem] right-1/2 translate-x-24 text-[10px] tabular-nums text-muted-foreground/60 tracking-widest z-10"
+            className="absolute bottom-[4.2rem] right-1/2 translate-x-24 text-[10px] tabular-nums text-white/40 tracking-widest z-10"
             initial={{ opacity: 0 }}
             animate={{ opacity: [0, 1, 1, 0] }}
             transition={{ duration: 2, times: [0, 0.1, 0.8, 1] }}

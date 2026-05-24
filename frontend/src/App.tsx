@@ -6,7 +6,6 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import ScrollToTop from "@/components/ScrollToTop";
 import SmartBackButton from "@/components/SmartBackButton";
-import PageTransition from "@/components/PageTransition";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import BottomNav from "@/components/BottomNav";
 
@@ -35,18 +34,18 @@ const AnimatedRoutes = () => {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<Index />} />
-        <Route path="/studio" element={<PageTransition><Studio /></PageTransition>} />
-        <Route path="/studio/passphoto" element={<PageTransition><PassPhoto /></PageTransition>} />
-        <Route path="/studio/photocopies" element={<PageTransition><PhotoCopies /></PageTransition>} />
-        <Route path="/studio/frames" element={<PageTransition><Frames /></PageTransition>} />
-        <Route path="/studio/snapnprint" element={<PageTransition><SnapnPrint /></PageTransition>} />
-        <Route path="/studio/album" element={<PageTransition><Album /></PageTransition>} />
-        <Route path="/checkout" element={<PageTransition><Checkout /></PageTransition>} />
-        <Route path="/about" element={<PageTransition><About /></PageTransition>} />
-        <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
-        <Route path="/future" element={<PageTransition><Future /></PageTransition>} />
-        <Route path="/account" element={<PageTransition><Account /></PageTransition>} />
-        <Route path="/login" element={<PageTransition><Account /></PageTransition>} />
+        <Route path="/studio" element={<Studio />} />
+        <Route path="/studio/passphoto" element={<PassPhoto />} />
+        <Route path="/studio/photocopies" element={<PhotoCopies />} />
+        <Route path="/studio/frames" element={<Frames />} />
+        <Route path="/studio/snapnprint" element={<SnapnPrint />} />
+        <Route path="/studio/album" element={<Album />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/future" element={<Future />} />
+        <Route path="/account" element={<Account />} />
+        <Route path="/login" element={<Account />} />
 
         {/* Admin Routes - The Layout handles sub-routes and protection */}
         <Route path="/admin/*" element={<AdminLayout />} />
