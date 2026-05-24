@@ -197,7 +197,7 @@ async getUserUploads(userId: string, options?: {
    * 🚀 CORE: Twin-Path Upload Orchestrator
    */
   async uploadPhoto(
-    file: Express.Multer.File,
+    file: any,
     userId: string,
     options?: { skipMaster?: boolean; stripExif?: boolean }
   ): Promise<UploadResult> {
@@ -306,7 +306,7 @@ async getUserUploads(userId: string, options?: {
   /**
    * 🔍 Validate File (Size & Type)
    */
-  async validateFile(file: Express.Multer.File): Promise<void> {
+  async validateFile(file: any): Promise<void> {
     // 1. Check MIME type
     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/tiff'];
     if (!allowedTypes.includes(file.mimetype)) {
@@ -343,7 +343,7 @@ async getUserUploads(userId: string, options?: {
   /**
    * 🔍 Metadata Extraction using Sharp + Exif-Reader
    */
-  async extractMetadata(file: Express.Multer.File): Promise<Omit<ImageMetadata, 'previewSize' | 'masterSize'>> {
+  async extractMetadata(file: any): Promise<Omit<ImageMetadata, 'previewSize' | 'masterSize'>> {
     const image = sharp(file.buffer);
     const metadata = await image.metadata();
 

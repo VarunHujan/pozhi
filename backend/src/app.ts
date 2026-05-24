@@ -7,7 +7,7 @@
 // ✅ Body parser fixed
 // ✅ Security headers active
 
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import hpp from 'hpp';
@@ -90,7 +90,7 @@ const allowedOrigins = env.NODE_ENV === 'production'
   ];
 
 app.use(cors({
-  origin: (origin, callback) => {
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
     // Allow requests with no origin (mobile apps, Postman, curl, etc.)
     if (!origin) {
       return callback(null, true);
@@ -124,7 +124,7 @@ if (env.NODE_ENV === 'development') {
 
 // Compression - Compress responses for faster transfer
 app.use(compression({
-  filter: (req, res) => {
+  filter: (req: Request, res: Response) => {
     if (req.headers['x-no-compression']) {
       return false;
     }
@@ -167,7 +167,7 @@ app.get('/api/v1/csrf-token', getCsrfToken);
 // ==========================================
 
 // Basic health check
-app.get('/', (req, res) => {
+app.get('/', (req: Request, res: Response) => {
   res.status(200).json({
     status: 'success',
     message: 'Luminia & Oak Studio Backend is Running 🚀',
@@ -178,7 +178,7 @@ app.get('/', (req, res) => {
 });
 
 // Detailed health check
-app.get('/health', async (req, res) => {
+app.get('/health', async (req: Request, res: Response) => {
   const healthStatus = {
     status: 'healthy',
     timestamp: new Date().toISOString(),
@@ -210,7 +210,7 @@ app.use('/api/v1/pricing', pricingRoutes); // Public pricing endpoints
 // ❌ 404 HANDLER
 // ==========================================
 
-app.use('*', (req, res) => {
+app.use('*', (req: Request, res: Response) => {
   res.status(404).json({
     status: 'error',
     message: `Route ${req.originalUrl} not found`,
