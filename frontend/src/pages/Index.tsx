@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import LoadingScreen from "@/components/LoadingScreen";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
-import CurtainTransition from "@/components/CurtainTransition";
 import { useAuth } from "@/contexts/AuthContext";
 import Studio from "./Studio";
 
@@ -12,7 +11,6 @@ const Index = () => {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [loading, setLoading] = useState(true);
   const [contentVisible, setContentVisible] = useState(false);
-  const [transitioning, setTransitioning] = useState(false);
   const navigate = useNavigate();
 
   const handleLoadingComplete = () => {
@@ -21,10 +19,6 @@ const Index = () => {
   };
 
   const handleEnterStudio = useCallback(() => {
-    setTransitioning(true);
-  }, []);
-
-  const handleTransitionComplete = useCallback(() => {
     navigate("/studio");
   }, [navigate]);
 
@@ -42,11 +36,6 @@ const Index = () => {
         <AnimatePresence>
           {loading && <LoadingScreen onComplete={handleLoadingComplete} />}
         </AnimatePresence>
-
-        <CurtainTransition
-          isActive={transitioning}
-          onComplete={handleTransitionComplete}
-        />
 
         <Navbar visible={contentVisible} />
 

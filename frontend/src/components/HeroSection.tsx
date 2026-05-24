@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useCallback } from "react";
 import { motion } from "framer-motion";
 import ParallaxGallery from "./ParallaxGallery";
 import AnimatedText from "./AnimatedText";
@@ -10,19 +10,14 @@ interface HeroSectionProps {
 }
 
 const HeroSection = ({ visible, onEnterStudio }: HeroSectionProps) => {
-  const [warpSpeed, setWarpSpeed] = useState(false);
-
   const handleEnterStudio = useCallback(() => {
-    setWarpSpeed(true);
-    setTimeout(() => {
-      onEnterStudio();
-    }, 1200); // UI/UX Pro Max: Optimized transition speed for better responsiveness
+    onEnterStudio();
   }, [onEnterStudio]);
 
   return (
     <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
       {/* Parallax Gallery Background — Now Light Luxe */}
-      <ParallaxGallery visible={visible} warpSpeed={warpSpeed} />
+      <ParallaxGallery visible={visible} />
 
       {/* Ambient center warm light — Subtle glow */}
       <div
