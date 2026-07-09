@@ -87,7 +87,7 @@ const Studio = () => {
               <div className="flex items-center gap-3 mb-6 md:mb-8 opacity-40">
                 <CornerRightDown className="w-4 h-4" />
                 <p className="text-[10px] font-body font-bold tracking-[0.5em] uppercase">
-                    THE ATELIER DE LUXE
+
                 </p>
               </div>
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-heading font-black text-heading leading-[0.95] tracking-tighter mb-6 md:mb-8">
@@ -99,25 +99,25 @@ const Studio = () => {
             </motion.div>
 
             <motion.div
-               initial={{ opacity: 0, y: 30 }}
-               animate={{ opacity: 1, y: 0 }}
-               transition={{ duration: 1.2, delay: 0.3 }}
-               className="flex flex-row lg:flex-col items-center lg:items-end justify-between lg:justify-end gap-2 border-t border-foreground/5 lg:border-none pt-8 lg:pt-0"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1.2, delay: 0.3 }}
+              className="flex flex-row lg:flex-col items-center lg:items-end justify-between lg:justify-end gap-2 border-t border-foreground/5 lg:border-none pt-8 lg:pt-0"
             >
-               <div className="flex flex-col lg:items-end gap-1">
-                 <span className="text-[10px] font-body font-bold text-foreground/20 tracking-[0.4em] uppercase">Selection Hub</span>
-                 <p className="hidden lg:block text-[11px] font-body font-bold text-foreground/40 uppercase tracking-[0.2em] max-w-[120px] text-right">
-                    Core Services <br /> Available Today
-                  </p>
-               </div>
-               <div className="flex items-center gap-4">
-                  <div className="opacity-80 scale-[0.6] -mr-6 -my-4">
-                    <img src="/favicon.ico" alt="Pozhi" className="w-16 h-16 object-contain" />
-                  </div>
-                  <p className="lg:hidden text-[11px] font-body font-bold text-foreground/40 uppercase tracking-[0.1em]">
-                    Core Services
-                  </p>
-               </div>
+              <div className="flex flex-col lg:items-end gap-1">
+                <span className="text-[10px] font-body font-bold text-foreground/20 tracking-[0.4em] uppercase">Selection Hub</span>
+                <p className="hidden lg:block text-[11px] font-body font-bold text-foreground/40 uppercase tracking-[0.2em] max-w-[120px] text-right">
+                  Core Services <br /> Available Today
+                </p>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="opacity-80 scale-[0.6] -mr-6 -my-4">
+                  <img src="/favicon.ico" alt="Pozhi" className="w-16 h-16 object-contain" />
+                </div>
+                <p className="lg:hidden text-[11px] font-body font-bold text-foreground/40 uppercase tracking-[0.1em]">
+                  Core Services
+                </p>
+              </div>
             </motion.div>
           </div>
 
@@ -136,7 +136,7 @@ const Studio = () => {
                 onClick={service.route ? () => navigate(service.route!) : undefined}
                 className={
                   index === 0 ? "lg:col-span-1" :
-                  index === 4 ? "md:col-span-2" : ""
+                    index === 4 ? "md:col-span-2" : ""
                 }
               />
             ))}
@@ -152,31 +152,31 @@ const Studio = () => {
           >
             {/* Soft geometric light wash */}
             <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-foreground/[0.02] rounded-full -translate-y-1/2 translate-x-1/2" />
-            
+
             <div className="relative flex flex-col md:flex-row items-center justify-between gap-12">
               <div className="max-w-lg">
                 <div className="flex items-center gap-3 mb-6">
-                    <div className="w-1.5 h-1.5 rounded-full bg-foreground/20 animate-pulse" />
-                    <p className="text-[10px] text-muted-foreground font-bold tracking-[0.4em] uppercase font-body">
-                      Ready to Capture?
-                    </p>
+                  <div className="w-1.5 h-1.5 rounded-full bg-foreground/20 animate-pulse" />
+                  <p className="text-[10px] text-muted-foreground font-bold tracking-[0.4em] uppercase font-body">
+                    Ready to Capture?
+                  </p>
                 </div>
                 <h2 className="text-3xl md:text-4xl font-heading font-black text-heading tracking-tight leading-none mb-4">
                   Initialize <br /> <span className="italic text-foreground/30">Your Session.</span>
                 </h2>
                 <p className="text-sm text-foreground/40 font-body tracking-[0.05em] leading-relaxed">
-                    Collaborate with our studio leads to architect your perfect photographic project. 
-                    Immediate response for all premium inquiries.
+                  Collaborate with our studio leads to architect your perfect photographic project.
+                  Immediate response for all premium inquiries.
                 </p>
               </div>
-              
+
               <button
                 onClick={() => navigate("/contact")}
                 className="group relative flex-shrink-0 px-12 py-6 bg-foreground text-background text-xs font-black tracking-[0.4em] uppercase rounded-full hover:bg-white hover:text-foreground hover:shadow-2xl transition-all duration-700 cursor-pointer overflow-hidden"
               >
                 <span className="relative z-10 flex items-center gap-3">
-                    Contact Atelier
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
+                  Contact Atelier
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
                 </span>
                 <div className="absolute inset-x-0 h-full top-0 bg-transparent group-hover:bg-foreground/5 transition-all" />
               </button>

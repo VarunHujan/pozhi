@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect, memo } from "react";
 import { motion } from "framer-motion";
 
 import img1 from "@/assets/parallax/01.jpg";
@@ -14,18 +14,107 @@ import img11 from "@/assets/parallax/11.jpg";
 import img12 from "@/assets/parallax/12.jpg";
 
 const columns = [
-  { images: [img1, img2, img3], speed: 35, scale: 1.05, blur: "0px", opacity: 0.8 },
-  { images: [img4, img6, img7], speed: 25, scale: 0.95, blur: "1px", opacity: 0.5 },
-  { images: [img8, img9, img10], speed: 45, scale: 1.1, blur: "0px", opacity: 0.7 },
-  { images: [img11, img12, img1], speed: 30, scale: 0.9, blur: "2px", opacity: 0.4 },
+  { images: [img11, img7, img3], speed: 42, scale: 1, opacity: 0.3, isHalf: true },
+  { images: [img1, img2, img3], speed: 35, scale: 1, opacity: 0.8, isHalf: false },
+  { images: [img4, img6, img7], speed: 25, scale: 1, opacity: 0.5, isHalf: false },
+  { images: [img8, img9, img10], speed: 45, scale: 1, opacity: 0.7, isHalf: false },
+  { images: [img11, img12, img1], speed: 30, scale: 1, opacity: 0.4, isHalf: false },
+  { images: [img2, img9, img12], speed: 38, scale: 1, opacity: 0.3, isHalf: true },
 ];
+
+const allAssetImages = [img1, img2, img3, img4, img6, img7, img8, img9, img10, img11, img12];
+
+interface ScrollColumnProps {
+  images: string[];
+  direction: "up" | "down";
+  baseSpeed: number;
+  warpSpeed: boolean;
+  scale: number;
+  opacity: number;
+  index: number;
+  isHalf?: boolean;
+}
+
+const ScrollColumn = memo(({ 
+  images, 
+  direction, 
+  baseSpeed, 
+  warpSpeed, 
+  scale, 
+  opacity,
+  index,
+  isHalf = false
+}: ScrollColumnProps) => {
+  // Create an infinite loop by doubling the images
+  const allImages = [...images, ...images];
+
+  // Calculate duration based on speed
+  const duration = warpSpeed ? 2 : baseSpeed;
+
+  const colWidthClass = isHalf ? "w-[22.5vw] md:w-[10vw] max-w-[160px]" : "w-[45vw] md:w-[20vw] max-w-[320px]";
+  // 4/5 aspect ratio means height = width * 1.25. 
+  // 45vw * 1.25 = 56.25vw. 20vw * 1.25 = 25vw. 320px * 1.25 = 400px.
+  const imgHeightClass = "h-[56.25vw] md:h-[25vw] max-h-[400px]"; 
+  
+  // On mobile, show only columns 1 and 2 (the first two full ones)
+  const displayClass = (index === 1 || index === 2) ? "block" : "hidden md:block";
+
+  return (
+    <div 
+      className={`relative ${colWidthClass} overflow-hidden h-[130vh] ${displayClass}`}
+      style={{ 
+        transform: `scale(${scale})`,
+        opacity: opacity,
+        contain: "strict"
+      }}
+    >
+      <div 
+        className={`flex flex-col gap-[10px] will-change-transform ${
+            direction === "up" ? "parallax-col-up" : "parallax-col-down"
+        }`}
+        style={{ 
+            animationDuration: `${duration}s`,
+            willChange: "transform"
+        }}
+      >
+        {allImages.map((src, i) => (
+          <div
+            key={i}
+            className={`relative w-full ${imgHeightClass} rounded-[10px] overflow-hidden flex-shrink-0 bg-zinc-400/5`}
+            style={{ transform: "translate3d(0,0,0)", backfaceVisibility: "hidden" }}
+          >
+            <img
+              src={src}
+              alt=""
+              className="w-full h-full object-cover"
+              loading="eager"
+              decoding="async"
+              draggable={false}
+              style={{ transform: "translate3d(0,0,0)", backfaceVisibility: "hidden" }}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+});
+
+ScrollColumn.displayName = "ScrollColumn";
 
 interface ParallaxGalleryProps {
   visible: boolean;
   warpSpeed?: boolean;
 }
 
-const ParallaxGallery = ({ visible, warpSpeed = false }: ParallaxGalleryProps) => {
+const ParallaxGallery = memo(({ visible, warpSpeed = false }: ParallaxGalleryProps) => {
+  // Preload all images on mount to ensure they are in cache
+  useEffect(() => {
+    allAssetImages.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
+  }, []);
+
   return (
     <motion.div
       className="absolute inset-0 overflow-hidden pointer-events-none"
@@ -33,7 +122,25 @@ const ParallaxGallery = ({ visible, warpSpeed = false }: ParallaxGalleryProps) =
       animate={{ opacity: visible ? 1 : 0, scale: 1 }}
       transition={{ duration: 1.5, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
     >
-      <div className="absolute inset-[-15%] flex gap-4 md:gap-6 justify-center items-center">
+      <style>
+        {`
+          @keyframes parallax-up {
+            from { transform: translate3d(0, 0, 0); }
+            to { transform: translate3d(0, -50%, 0); }
+          }
+          @keyframes parallax-down {
+            from { transform: translate3d(0, -50%, 0); }
+            to { transform: translate3d(0, 0, 0); }
+          }
+          .parallax-col-up {
+            animation: parallax-up linear infinite;
+          }
+          .parallax-col-down {
+            animation: parallax-down linear infinite;
+          }
+        `}
+      </style>
+      <div className="absolute inset-[-15%] flex gap-[10px] justify-center items-center">
         {columns.map((col, colIdx) => (
           <ScrollColumn
             key={colIdx}
@@ -43,123 +150,21 @@ const ParallaxGallery = ({ visible, warpSpeed = false }: ParallaxGalleryProps) =
             baseSpeed={col.speed}
             warpSpeed={warpSpeed}
             scale={col.scale}
-            blur={col.blur}
             opacity={col.opacity}
+            isHalf={col.isHalf}
           />
         ))}
       </div>
 
-      {/* Premium Multi-layer gradient overlays — Reduced 'milky' intensity */}
+      {/* Premium Multi-layer gradient overlays */}
       <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-transparent to-background/60 pointer-events-none" />
       
-      {/* Side vignette — Reduced opacity for deeper look */}
+      {/* Side vignette */}
       <div className="absolute inset-x-0 inset-y-0 bg-[radial-gradient(circle_at_center,transparent_30%,hsl(var(--background))_110%)] pointer-events-none opacity-40" />
-
-      {/* Luxury Texture Grain */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-[0.02] mix-blend-overlay"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-          backgroundRepeat: "repeat",
-          backgroundSize: "150px 150px",
-        }}
-      />
     </motion.div>
   );
-};
+});
 
-interface ScrollColumnProps {
-  images: string[];
-  direction: "up" | "down";
-  baseSpeed: number;
-  warpSpeed: boolean;
-  scale: number;
-  blur: string;
-  opacity: number;
-  index: number;
-}
-
-const ScrollColumn = ({ 
-  images, 
-  direction, 
-  baseSpeed, 
-  warpSpeed, 
-  scale, 
-  blur, 
-  opacity,
-  index
-}: ScrollColumnProps) => {
-  const columnRef = useRef<HTMLDivElement>(null);
-  const offsetRef = useRef(0);
-  const animRef = useRef<number>();
-  
-  // Create an infinite loop by tripling the images
-  const allImages = [...images, ...images, ...images];
-
-  useEffect(() => {
-    const column = columnRef.current;
-    if (!column) return;
-
-    const singleSetHeight = column.scrollHeight / 3;
-    offsetRef.current = direction === "up" ? 0 : -singleSetHeight;
-
-    const animate = () => {
-      // Warp speed logic: speed up drastically when warpSpeed is active
-      const currentSpeed = warpSpeed ? 2 : baseSpeed;
-      const delta = direction === "up" ? -1 : 1;
-      
-      offsetRef.current += (delta * 60) / currentSpeed;
-
-      if (direction === "up" && offsetRef.current <= -singleSetHeight) {
-        offsetRef.current += singleSetHeight;
-      } else if (direction === "down" && offsetRef.current >= 0) {
-        offsetRef.current -= singleSetHeight;
-      }
-
-      column.style.transform = `translateY(${offsetRef.current}px) translateZ(0)`;
-      animRef.current = requestAnimationFrame(animate);
-    };
-
-    animRef.current = requestAnimationFrame(animate);
-    return () => {
-      if (animRef.current) cancelAnimationFrame(animRef.current);
-    };
-  }, [direction, baseSpeed, warpSpeed]);
-
-  return (
-    <div 
-      className={`relative w-[45vw] md:w-[20vw] max-w-[320px] overflow-hidden h-[130vh] transition-all duration-1000 ${
-        index >= 2 ? "hidden md:block" : "block"
-      }`}
-      style={{ 
-        filter: `blur(${blur})`,
-        transform: `scale(${scale})`,
-        opacity: opacity
-      }}
-    >
-      <div 
-        ref={columnRef} 
-        className="flex flex-col gap-6 will-change-transform"
-      >
-        {allImages.map((src, i) => (
-          <div
-            key={i}
-            className="relative w-full aspect-[4/5] rounded-[2rem] overflow-hidden flex-shrink-0 bg-zinc-400/10 shadow-3xl transition-transform hover:scale-[1.02] duration-500"
-          >
-            <img
-              src={src}
-              alt=""
-              className="w-full h-full object-cover filter contrast-[1.1] brightness-[1.05] grayscale-[0.2] hover:grayscale-0 transition-all duration-700"
-              loading="lazy"
-              draggable={false}
-            />
-            {/* Elegant overlay for depth */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-black/20 to-transparent mix-blend-overlay" />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
+ParallaxGallery.displayName = "ParallaxGallery";
 
 export default ParallaxGallery;

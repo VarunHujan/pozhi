@@ -187,7 +187,7 @@ const SnapnPrint = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
-        className="pt-24 pb-24 md:pt-40 md:pb-40 px-6 md:px-12 relative z-10"
+        className="pt-24 pb-40 md:pt-40 md:pb-40 px-6 md:px-12 relative z-10"
       >
         <div className="max-w-7xl mx-auto">
           {/* Header Section — Editorial High Contrast */}

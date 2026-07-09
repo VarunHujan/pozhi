@@ -165,7 +165,7 @@ const Account = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="min-h-screen pt-24 pb-32 px-4 md:px-8 flex justify-center bg-[#F8F9FA]"
+        className="min-h-screen pt-24 pb-40 px-4 md:px-8 flex justify-center bg-[#F8F9FA]"
       >
         <div className="w-full max-w-5xl">
             <div className="flex flex-col md:flex-row gap-8">

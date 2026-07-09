@@ -1,7 +1,6 @@
-import { useCallback } from "react";
+import { useCallback, memo } from "react";
 import { motion } from "framer-motion";
 import ParallaxGallery from "./ParallaxGallery";
-import AnimatedText from "./AnimatedText";
 import { Play } from "lucide-react";
 
 interface HeroSectionProps {
@@ -9,7 +8,7 @@ interface HeroSectionProps {
   onEnterStudio: () => void;
 }
 
-const HeroSection = ({ visible, onEnterStudio }: HeroSectionProps) => {
+const HeroSection = memo(({ visible, onEnterStudio }: HeroSectionProps) => {
   const handleEnterStudio = useCallback(() => {
     onEnterStudio();
   }, [onEnterStudio]);
@@ -87,6 +86,8 @@ const HeroSection = ({ visible, onEnterStudio }: HeroSectionProps) => {
       <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-background/40 via-background/10 to-transparent z-10 pointer-events-none" />
     </section>
   );
-};
+});
+
+HeroSection.displayName = "HeroSection";
 
 export default HeroSection;

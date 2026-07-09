@@ -124,7 +124,7 @@ const Frames = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="pt-24 pb-32 px-4 md:px-8 lg:px-12"
+        className="pt-24 pb-40 px-4 md:px-8 lg:px-12"
       >
         <div className="max-w-6xl mx-auto">
           {/* Split layout */}

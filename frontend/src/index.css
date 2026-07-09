@@ -97,8 +97,8 @@
   }
 
   .glass {
-    backdrop-filter: blur(20px) saturate(180%);
-    background-color: hsla(0, 0%, 100%, 0.8);
+    backdrop-filter: blur(8px) saturate(150%);
+    background-color: hsla(0, 0%, 100%, 0.85);
     border-bottom: 1px solid hsl(var(--border));
   }
 

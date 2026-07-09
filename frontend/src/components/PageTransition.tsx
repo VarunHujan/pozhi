@@ -17,7 +17,7 @@ const PageTransition = ({ children }: PageTransitionProps) => {
         animate={{ scaleY: 0 }}
         exit={{ scaleY: 1 }}
         transition={{
-          duration: 0.6,
+          duration: 0.4,
           ease: [0.76, 0, 0.24, 1],
         }}
         style={{ transformOrigin: "top" }}
@@ -30,8 +30,8 @@ const PageTransition = ({ children }: PageTransitionProps) => {
         animate={{ scaleY: 0 }}
         exit={{ scaleY: 1 }}
         transition={{
-          duration: 0.6,
-          delay: 0.1,
+          duration: 0.4,
+          delay: 0.08,
           ease: [0.76, 0, 0.24, 1],
         }}
         style={{ transformOrigin: "top" }}

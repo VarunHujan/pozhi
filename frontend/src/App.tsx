@@ -61,8 +61,10 @@ const NavigationWrapper = () => {
   const { isAuthenticated } = useAuth();
   const location = useLocation();
   
-  // Show bottom nav only for authenticated users on non-admin routes
-  const showBottomNav = isAuthenticated && !location.pathname.startsWith('/admin');
+  // Hide bottom nav on service pages and checkout to avoid button overlaps
+  const isServicePage = location.pathname.startsWith('/studio/') && location.pathname !== '/studio';
+  const isCheckoutPage = location.pathname === '/checkout';
+  const showBottomNav = isAuthenticated && !location.pathname.startsWith('/admin') && !isServicePage && !isCheckoutPage;
   
   return showBottomNav ? <BottomNav /> : null;
 };
@@ -90,7 +92,11 @@ const ContentWrapper = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuth();
   const location = useLocation();
   const isAdmin = location.pathname.startsWith('/admin');
-  const isPortal = isAuthenticated && !isAdmin;
+  const isServicePage = location.pathname.startsWith('/studio/') && location.pathname !== '/studio';
+  const isCheckoutPage = location.pathname === '/checkout';
+  
+  // Only apply bottom padding if bottom nav is actually visible
+  const isPortal = isAuthenticated && !isAdmin && !isServicePage && !isCheckoutPage;
   
   if (isAdmin) {
     return <>{children}</>;

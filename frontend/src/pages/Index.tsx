@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, memo } from "react";
 import { AnimatePresence, LayoutGroup } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import LoadingScreen from "@/components/LoadingScreen";
@@ -7,7 +7,7 @@ import HeroSection from "@/components/HeroSection";
 import { useAuth } from "@/contexts/AuthContext";
 import Studio from "./Studio";
 
-const Index = () => {
+const Index = memo(() => {
   const { isAuthenticated, user, isLoading: authLoading, completeGoogleLoginWithHash } = useAuth();
   const [loading, setLoading] = useState(() => {
     // Check if we've already loaded in this session or if we have an OAuth hash
@@ -84,6 +84,8 @@ const Index = () => {
       </LayoutGroup>
     </>
   );
-};
+});
+
+Index.displayName = "Index";
 
 export default Index;

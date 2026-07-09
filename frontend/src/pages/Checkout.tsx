@@ -141,7 +141,7 @@ const Checkout = () => {
         initial="initial"
         animate="animate"
         exit="exit"
-        className="min-h-screen pt-24 pb-12 px-4 sm:px-6 bg-slate-50/50"
+        className="min-h-screen pt-24 pb-40 px-4 sm:px-6 bg-slate-50/50"
       >
         <div className="max-w-5xl mx-auto">
           <AnimatePresence mode="wait">
@@ -354,7 +354,7 @@ const CheckoutForm = ({
 
     {/* Right Column: Order Summary */}
     <div className="w-full lg:w-[380px]">
-      <div className="sticky top-28 space-y-6">
+      <div className="lg:sticky top-28 space-y-6">
         <motion.div variants={fadeSlideUp} className="bg-slate-900 rounded-3xl p-8 text-white shadow-xl shadow-slate-200">
           <h2 className="text-lg font-semibold mb-6 pb-6 border-b border-white/10">Order Summary</h2>
           
