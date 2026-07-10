@@ -192,8 +192,8 @@ const Frames = () => {
                 </p>
                 <MaterialTabs
                   materials={materials}
-                  selectedId={selectedMaterial}
-                  onSelect={setSelectedMaterial}
+                  selectedMaterial={selectedMaterial}
+                  onMaterialChange={setSelectedMaterial}
                 />
               </div>
 

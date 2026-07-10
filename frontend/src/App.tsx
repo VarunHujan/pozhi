@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -69,24 +70,34 @@ const NavigationWrapper = () => {
   return showBottomNav ? <BottomNav /> : null;
 };
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <AuthProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <ScrollToTop />
-          <SmartBackButton />
-          <ContentWrapper>
-            <AnimatedRoutes />
-          </ContentWrapper>
-          <NavigationWrapper />
-        </BrowserRouter>
-      </AuthProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  // Silently wake up the backend and prefetch all pricing data in the background
+  // This hides Render's cold start delay and makes service pages load instantly!
+  useEffect(() => {
+    import("@/services/api").then(({ fetchAllPricing }) => {
+      fetchAllPricing().catch((err) => console.log('Silent prefetch skipped:', err));
+    });
+  }, []);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <AuthProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <ScrollToTop />
+            <SmartBackButton />
+            <ContentWrapper>
+              <AnimatedRoutes />
+            </ContentWrapper>
+            <NavigationWrapper />
+          </BrowserRouter>
+        </AuthProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 const ContentWrapper = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuth();

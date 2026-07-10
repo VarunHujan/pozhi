@@ -221,7 +221,7 @@ const PhotoCopies = () => {
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
                   Order Type
                 </p>
-                <ModeTabs activeTab={activeTab} onSelect={setActiveTab} />
+                <ModeTabs activeTab={activeTab} onTabChange={setActiveTab} />
               </div>
 
               {/* Tab Content */}
