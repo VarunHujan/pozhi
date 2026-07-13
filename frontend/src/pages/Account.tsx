@@ -52,18 +52,18 @@ const Account = () => {
     }
   }, [completeGoogleLogin, completeGoogleLoginWithHash, navigate, searchParams]);
 
-  // Redirect admin users to the admin portal
-  useEffect(() => {
-    if (isAuthenticated && user?.role === 'admin') {
-      const adminUrl = window.location.hostname.includes('admin') 
-        ? window.location.origin 
-        : 'https://admin.pozhi.in';
-      
-      if (!window.location.hostname.includes('admin')) {
-        window.location.href = `${adminUrl}/login${window.location.hash}`;
-      }
-    }
-  }, [isAuthenticated, user]);
+  // Redirect admin users to the admin portal (COMMENTED OUT TO PREVENT FORCED REDIRECT)
+  // useEffect(() => {
+  //   if (isAuthenticated && user?.role === 'admin') {
+  //     const adminUrl = window.location.hostname.includes('admin') 
+  //       ? window.location.origin 
+  //       : 'https://admin.pozhi.in';
+  //     
+  //     if (!window.location.hostname.includes('admin')) {
+  //       window.location.href = `${adminUrl}/login${window.location.hash}`;
+  //     }
+  //   }
+  // }, [isAuthenticated, user]);
 
   useEffect(() => {
     if (isAuthenticated && user) {
