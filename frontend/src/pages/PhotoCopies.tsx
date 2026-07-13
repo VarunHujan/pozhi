@@ -87,7 +87,7 @@ const PhotoCopies = () => {
 
     navigate("/checkout", {
       state: {
-        service: "Photo Copies",
+        service: "PhotoCopies",
         title:
           activeTab === "single"
             ? `${currentSingle?.sizeLabel} — ${currentSingle?.copies}`

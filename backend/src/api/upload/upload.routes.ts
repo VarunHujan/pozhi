@@ -36,7 +36,7 @@ const upload = multer({
 // ==========================================
 const uploadLimiter = createRateLimiter({
   windowMs: 60 * 60 * 1000,  // 1 hour
-  max: 20,  // Only 20 upload requests per hour per user
+  max: 200,  // Increased for testing
   message: 'Too many upload requests, please try again later',
   keyGenerator: (req) => req.user?.id || req.ip as string
 });

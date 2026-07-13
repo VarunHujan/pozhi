@@ -238,11 +238,13 @@ export async function uploadFiles(files: File[]) {
         }
     });
 
+    const json = await response.json().catch(() => null);
+
     if (!response.ok) {
-        throw new Error('Failed to upload files');
+        throw new Error(json?.message || `Failed to upload files (${response.status})`);
     }
 
-    return await response.json();
+    return json;
 }
 
 // ==========================================

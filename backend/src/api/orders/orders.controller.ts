@@ -339,7 +339,7 @@ export const getAllOrders = async (
 
     const { data: orders, error } = await supabaseAdmin
       .from('orders')
-      .select('*, order_items(*)')
+      .select('*, order_items(*, user_uploads(*))')
       .order('created_at', { ascending: false });
 
     if (error) throw new ApiError(500, 'Failed to fetch orders');
@@ -370,7 +370,7 @@ export const getOrderById = async (
 
     const { data: order, error } = await supabaseAdmin
       .from('orders')
-      .select('*, order_items(*)')
+      .select('*, order_items(*, user_uploads(*))')
       .eq('id', id)
       .eq('user_id', userId)
       .single();
@@ -474,19 +474,79 @@ export const getAdminStats = async (
   try {
     if (req.user?.role !== 'admin') throw new ApiError(403, 'Admin access required');
 
+    const { startDate, endDate } = req.query;
+
+    // Only count 'delivered' orders for income
     const { data: orders } = await supabaseAdmin
       .from('orders')
-      .select('total_amount, created_at')
-      .neq('order_status', 'cancelled');
+      .select('id, service_type, total_amount, created_at')
+      .eq('order_status', 'delivered');
 
-    const stats = {
-      lifetime: orders?.reduce((sum, o) => sum + Number(o.total_amount), 0) || 0,
-      count: orders?.length || 0
-    };
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
+    const startOfYesterday = new Date(startOfToday);
+    startOfYesterday.setDate(startOfYesterday.getDate() - 1);
+    
+    const startOfWeek = new Date(startOfToday);
+    startOfWeek.setDate(startOfToday.getDate() - startOfToday.getDay());
+    
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const startOfYear = new Date(now.getFullYear(), 0, 1);
+
+    let today = 0, yesterday = 0, thisWeek = 0, thisMonth = 0, thisYear = 0, lifetime = 0;
+    let customTotal = 0, customCount = 0;
+
+    const startCustom = startDate ? new Date(startDate as string) : null;
+    let endCustom = endDate ? new Date(endDate as string) : null;
+    if (endCustom && !isNaN(endCustom.getTime())) {
+      endCustom.setHours(23, 59, 59, 999);
+    }
+
+    (orders || []).forEach((o: any) => {
+      const amount = Number(o.total_amount) || 0;
+      const d = new Date(o.created_at);
+
+      lifetime += amount;
+      if (d >= startOfToday) today += amount;
+      if (d >= startOfYesterday && d < startOfToday) yesterday += amount;
+      if (d >= startOfWeek) thisWeek += amount;
+      if (d >= startOfMonth) thisMonth += amount;
+      if (d >= startOfYear) thisYear += amount;
+
+      if (startCustom && endCustom && d >= startCustom && d <= endCustom) {
+        customTotal += amount;
+        customCount++;
+      }
+    });
+
+    const sorted = [...(orders || [])].sort((a: any, b: any) => 
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+
+    const recent = sorted.slice(0, 10).map((o: any) => ({
+      id: o.id,
+      service: o.service_type,
+      amount: Number(o.total_amount) || 0,
+      createdAt: o.created_at
+    }));
 
     res.status(200).json({
       success: true,
-      data: stats
+      data: {
+        today,
+        yesterday,
+        thisWeek,
+        thisMonth,
+        thisYear,
+        lifetime,
+        customRange: {
+          total: customTotal,
+          orderCount: customCount,
+          active: !!(startDate && endDate)
+        },
+        recentOrders: recent
+      }
     });
 
   } catch (error) {

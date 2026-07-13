@@ -35,15 +35,17 @@ const Index = memo(() => {
   // Redirect admin users to the admin portal if they land on the main site
   useEffect(() => {
     if (isAuthenticated && user?.role === 'admin') {
-      // If we're on the main site but the user is an admin, 
-      // they probably came from the admin login flow
-      const adminUrl = window.location.hostname.includes('admin') 
-        ? window.location.origin 
-        : 'https://admin.pozhi.in';
-      
-      // Only redirect if we are NOT already on the admin domain
-      if (!window.location.hostname.includes('admin')) {
-        window.location.href = `${adminUrl}/login${window.location.hash}`;
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const isAdminDomain = window.location.hostname.includes('admin');
+      const isAdminPath = window.location.pathname.startsWith('/admin');
+
+      // If we are on production frontend (pozhi.in), redirect to admin.pozhi.in
+      if (!isAdminDomain && !isLocalhost) {
+        window.location.href = `https://admin.pozhi.in/login${window.location.hash}`;
+      } 
+      // If we are on localhost frontend, redirect to local admin route (/admin)
+      else if (isLocalhost && !isAdminPath) {
+        window.location.href = `/admin/login${window.location.hash}`;
       }
     }
   }, [isAuthenticated, user]);

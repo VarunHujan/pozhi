@@ -118,7 +118,7 @@ const SnapnPrint = () => {
 
     navigate("/checkout", {
       state: {
-        service: "Snap n' Print",
+        service: "SnapnPrint",
         title: `${currentCategoryData.label} — ${currentPackage.label}`,
         details: [
           { label: "Service Type", value: `${currentCategoryData.label}` },

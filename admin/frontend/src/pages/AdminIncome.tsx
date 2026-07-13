@@ -57,7 +57,7 @@ const AdminIncome = () => {
   };
 
   const getDisplayValue = () => {
-    if (filter === 'custom') return stats.customRange.total;
+    if (filter === 'custom') return stats.customRange?.total ?? 0;
     switch (filter) {
       case 'day': return stats.today;
       case 'week': return stats.thisWeek;
@@ -68,7 +68,7 @@ const AdminIncome = () => {
     }
   };
 
-  const diffYesterday = stats.today - stats.yesterday;
+  const diffYesterday = (stats.today ?? 0) - (stats.yesterday ?? 0);
 
   const handleQuickRange = (range: 'yesterday' | 'this-week' | 'last-7' | 'this-month') => {
     let from = new Date();
@@ -209,7 +209,7 @@ const AdminIncome = () => {
           <div className="flex items-baseline gap-2">
             <span className="text-2xl font-medium text-gray-500">₹</span>
             <p className="text-6xl md:text-7xl font-bold leading-none tracking-tighter">
-              {getDisplayValue().toLocaleString()}
+              {(getDisplayValue() ?? 0).toLocaleString()}
             </p>
           </div>
 
@@ -223,7 +223,7 @@ const AdminIncome = () => {
 
           {filter === 'custom' && (
             <div className="flex items-center gap-1.5 mt-8 px-4 py-2 rounded-full w-fit font-bold text-sm bg-blue-500/10 text-blue-400">
-              Found {stats.customRange.orderCount} records in this period
+              Found {stats.customRange?.orderCount ?? 0} records in this period
             </div>
           )}
         </div>
@@ -232,10 +232,10 @@ const AdminIncome = () => {
       {/* Quick Stats Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
         {[
-          { label: "Day", val: stats.today },
-          { label: "Week", val: stats.thisWeek },
-          { label: "Month", val: stats.thisMonth },
-          { label: "Lifetime", val: stats.lifetime },
+          { label: "Day", val: stats.today ?? 0 },
+          { label: "Week", val: stats.thisWeek ?? 0 },
+          { label: "Month", val: stats.thisMonth ?? 0 },
+          { label: "Lifetime", val: stats.lifetime ?? 0 },
         ].map((item, i) => (
           <motion.div
             initial={{ opacity: 0, y: 12 }}
@@ -264,8 +264,8 @@ const AdminIncome = () => {
           <ArrowUpRight className="w-4 h-4 text-gray-400" />
         </div>
         <div className="divide-y divide-gray-50 max-h-[600px] overflow-y-auto custom-scrollbar">
-          {stats.recentOrders.length > 0 ? (
-            stats.recentOrders.map((order, i) => (
+          {(stats.recentOrders ?? []).length > 0 ? (
+            (stats.recentOrders ?? []).map((order, i) => (
               <motion.div
                 key={order.id}
                 initial={{ opacity: 0, x: -10 }}
@@ -285,7 +285,7 @@ const AdminIncome = () => {
                   </div>
                 </div>
                 <span className="text-sm font-bold text-emerald-600">
-                  +₹{order.amount.toLocaleString()}
+                  +₹{(order.amount ?? 0).toLocaleString()}
                 </span>
               </motion.div>
             ))

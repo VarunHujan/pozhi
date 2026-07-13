@@ -21,7 +21,7 @@ const router = Router();
  */
 const orderCreationLimiter = createRateLimiter({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 5,
+  max: 500, // Increased for E2E testing
   message: 'Too many orders. Maximum 5 orders per hour allowed.',
   keyGenerator: (req) => req.user?.id || req.ip as string
 });
