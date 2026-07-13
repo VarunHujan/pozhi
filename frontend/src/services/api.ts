@@ -299,7 +299,14 @@ export async function createOrder(orderData: any) {
     });
 
     if (!response.ok) {
-        throw new Error('Failed to create order');
+        let errMsg = 'Failed to create order';
+        try {
+            const error = await response.json();
+            errMsg = error.message || error.error || errMsg;
+        } catch (e) {
+            // ignore JSON parse error
+        }
+        throw new Error(errMsg);
     }
 
     return await response.json();

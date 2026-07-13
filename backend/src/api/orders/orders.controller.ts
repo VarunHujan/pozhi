@@ -195,12 +195,10 @@ export const createOrder = async (
         gift_wrap_charge: giftWrapCharge,
         customer_name,
         customer_phone,
-        customer_email: req.user?.email || '',
         delivery_address,
         event_date,
         payment_status: 'pending',
-        order_status: 'pending',
-        ip_address: ipAddress
+        order_status: 'pending'
       })
       .select()
       .single();
