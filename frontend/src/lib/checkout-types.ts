@@ -9,4 +9,5 @@ export interface CheckoutState {
   details: OrderDetail[];
   price: number;
   isBooking?: boolean;
+  imageFile?: File | null;
 }

@@ -6,7 +6,7 @@ import { useState, useRef } from "react";
 interface PhotoPreviewProps {
   category: Category;
   selectedPack: Pack;
-  onImageSelect: (imageUrl: string | null) => void;
+  onImageSelect: (imageUrl: string | null, file?: File | null) => void;
   selectedImage: string | null;
 }
 
@@ -21,7 +21,7 @@ const PhotoPreview = ({ category, selectedPack, onImageSelect, selectedImage }: 
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        onImageSelect(reader.result as string);
+        onImageSelect(reader.result as string, file);
       };
       reader.readAsDataURL(file);
     }

@@ -20,6 +20,7 @@ const Frames = () => {
   const [selectedMaterial, setSelectedMaterial] = useState<FrameMaterial>("glass");
   const [selectedSizeId, setSelectedSizeId] = useState("");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   // Fetch pricing from API
   useEffect(() => {
@@ -76,6 +77,7 @@ const Frames = () => {
           { label: "Size", value: currentSize.sizeLabel },
         ],
         price: currentSize.price,
+        imageFile: selectedFile,
       },
     });
   };
@@ -140,7 +142,10 @@ const Frames = () => {
                 size={currentSize} 
                 material={selectedMaterial} 
                 selectedImage={selectedImage}
-                onImageSelect={setSelectedImage}
+                onImageSelect={(img, file) => {
+                  setSelectedImage(img);
+                  setSelectedFile(file || null);
+                }}
               />
             </motion.div>
 

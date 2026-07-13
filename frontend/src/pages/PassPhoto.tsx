@@ -17,6 +17,7 @@ const PassPhoto = () => {
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
   const [selectedPackIds, setSelectedPackIds] = useState<Record<string, string>>({});
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   // Fetch pricing from API on mount
   useEffect(() => {
@@ -86,6 +87,7 @@ const PassPhoto = () => {
           { label: "Copies", value: String(currentPack.copies) },
         ],
         price: currentPack.price,
+        imageFile: selectedFile,
       },
     });
   };
@@ -149,7 +151,10 @@ const PassPhoto = () => {
               <PhotoPreview 
                 category={currentCategory} 
                 selectedPack={currentPack} 
-                onImageSelect={setSelectedImage}
+                onImageSelect={(img, file) => {
+                  setSelectedImage(img);
+                  setSelectedFile(file || null);
+                }}
                 selectedImage={selectedImage}
               />
             </motion.div>

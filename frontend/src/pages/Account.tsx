@@ -343,6 +343,17 @@ const Account = () => {
                                                     </div>
                                                 </div>
                                             </div>
+
+                                            {/* Order Images */}
+                                            {order.order_items?.some(item => item.user_uploads?.storage_url) && (
+                                                <div className="mt-6 flex flex-wrap gap-3">
+                                                    {order.order_items.map((item, idx) => item.user_uploads?.storage_url ? (
+                                                        <div key={idx} className="w-16 h-16 rounded-lg overflow-hidden border border-gray-200 shadow-sm">
+                                                            <img src={item.user_uploads.storage_url} alt="Order attachment" className="w-full h-full object-cover" />
+                                                        </div>
+                                                    ) : null)}
+                                                </div>
+                                            )}
                                         </div>
                                     ))}
                                 </div>

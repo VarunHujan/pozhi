@@ -9,7 +9,7 @@ import SuccessScreen from "@/components/checkout/SuccessScreen";
 import FailureScreen from "@/components/checkout/FailureScreen";
 import type { CheckoutState } from "@/lib/checkout-types";
 import { useAuth } from "@/contexts/AuthContext";
-import { createOrder } from "@/services/api";
+import { createOrder, uploadFiles } from "@/services/api";
 
 const GIFT_WRAP_PRICE = 30;
 
@@ -83,12 +83,23 @@ const Checkout = () => {
     setStatus("processing");
     
     try {
+      let uploadedUploadId = null;
+      if (orderState.imageFile) {
+        const uploadResult = await uploadFiles([orderState.imageFile]);
+        if (uploadResult.success && uploadResult.data?.uploads?.length > 0) {
+          uploadedUploadId = uploadResult.data.uploads[0].id;
+        } else {
+          throw new Error("Failed to upload image. Please try again.");
+        }
+      }
+
       // Prepare items for backend
       const items = [{
         service_type: orderState.service,
         title: orderState.title,
         quantity: 1,
         unit_price: orderState.price,
+        ...(uploadedUploadId ? { user_upload_id: uploadedUploadId } : {}),
         details: {
           ...orderState.details.reduce((acc: any, curr) => {
             acc[curr.label] = curr.value;

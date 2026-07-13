@@ -22,6 +22,7 @@ const PhotoCopies = () => {
   const [selectedSetId, setSelectedSetId] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   // Fetch pricing from API
   useEffect(() => {
@@ -106,6 +107,7 @@ const PhotoCopies = () => {
                   : []),
               ],
         price: totalPrice,
+        imageFile: selectedFile,
       },
     });
   };
@@ -170,7 +172,10 @@ const PhotoCopies = () => {
                 aspectRatio={currentAspectRatio || "6/4"}
                 sizeLabel={currentSizeLabel || ""}
                 selectedImage={selectedImage}
-                onImageSelect={setSelectedImage}
+                onImageSelect={(img, file) => {
+                  setSelectedImage(img);
+                  setSelectedFile(file || null);
+                }}
               />
             </motion.div>
 
